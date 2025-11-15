@@ -1,8 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 
 export default function MergePdfPage() {
+    useEffect(() => {
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      // ignore errors in development
+    }
+  }, []);
   const [files, setFiles] = useState([]);
   const [isMerging, setIsMerging] = useState(false);
   const [error, setError] = useState('');
@@ -148,8 +155,16 @@ export default function MergePdfPage() {
             {error && <p className="error">{error}</p>}
 
             <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
+            <ins
+            className="adsbygoogle"
+            style={{ display: 'block' }}
+            data-ad-client="ca-pub-9212010274013202"   // your publisher ID
+            data-ad-slot="5251243129"              // ad unit ID from AdSense
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+            ></ins>
             </div>
+
           </section>
 
           <section className="seo-text">

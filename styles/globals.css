@@ -309,4 +309,29 @@ a {
   .tool-section {
     padding: 1.5rem;
   }
+
+.dropzone {
+  cursor: pointer;
+  text-align: center;
+}
+
+.dropzone:hover {
+  background: #eef3ff;
+  border-color: #b0c4ff;
+}
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.option-row select {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid #cbd5f5;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
 }

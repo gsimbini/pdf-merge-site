@@ -227,6 +227,19 @@ a {
   background: #f9fafb;
 }
 
+.option-row label {
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.text-input {
+  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid #cbd5f5;
+  font-size: 0.9rem;
+  min-width: 180px;
+}
+
 .upload-box input[type='file'] {
   display: block;
   margin-bottom: 0.6rem;

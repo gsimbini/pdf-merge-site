@@ -111,6 +111,17 @@ export default function HomePage() {
                 <p>Export a single PDF page as a PNG image.</p>
               </Link>
 
+              <Link href="/pdf-to-excel" className="tool-card">
+                <h4>PDF to Excel (text)</h4>
+                <p>Extract PDF text into Excel with one row per line and page number.</p>
+              </Link>
+
+              <Link href="/ocr-to-pdf" className="tool-card">
+  <h4>OCR to PDF</h4>
+  <p>Run OCR on a scanned PDF and create a text-only searchable PDF.</p>
+</Link>
+
+
               <Link href="/pdf-to-word" className="tool-card">
                 <h4>PDF to Word (text)</h4>
                 <p>Extract the text from a PDF and download it as a simple Word document.</p>

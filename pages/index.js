@@ -1,15 +1,211 @@
 // pages/index.js
 import Head from 'next/head';
 import Link from 'next/link';
+import { useState } from 'react';
+import AdBanner from '../components/AdBanner';
 
 export default function HomePage() {
+  const [search, setSearch] = useState('');
+
+  const q = search.trim().toLowerCase();
+
+  const popularTools = [
+    {
+      href: '/merge-pdf',
+      title: 'Merge PDF',
+      description: 'Combine multiple PDFs into a single document.',
+    },
+      {
+    href: '/pdf-to-pdfa',
+    title: 'PDF to PDF/A (basic)',
+    description:
+      'Create a simple archival-style copy of a PDF (browser-only, not strict validator-grade).',
+    },
+    {
+      href: '/split-pdf',
+      title: 'Split PDF',
+      description: 'Extract selected pages or ranges into a new PDF.',
+    },
+    {
+    href: '/pdf-to-powerpoint',
+    title: 'PDF to PowerPoint (text slides)',
+    description:
+      'Make a simple PowerPoint where each PDF page becomes a slide with text bullets.',
+    },
+    {
+    href: '/powerpoint-to-pdf',
+    title: 'PowerPoint to PDF (images)',
+    description:
+      'Export slides as images (JPG/PNG) and turn them into a PDF, one slide per page.',
+    },
+    {
+      href: '/compress-pdf',
+      title: 'Compress PDF',
+      description: 'Reduce file size while keeping readable quality.',
+    },
+    {
+      href: '/rotate-pdf',
+      title: 'Rotate PDF',
+      description: 'Fix sideways or upside-down pages instantly.',
+    },
+  ];
+
+  const editTools = [
+    {
+      href: '/organize-pdf',
+      title: 'Organise PDF',
+      description: 'Reorder, duplicate or remove pages by choosing an order.',
+    },
+    {
+      href: '/crop-pdf',
+      title: 'Crop PDF',
+      description: 'Trim margins and crop all pages at once.',
+    },
+    {
+      href: '/page-numbers',
+      title: 'Add page numbers',
+      description: 'Add page numbers to all or some pages.',
+    },
+    {
+      href: '/watermark-pdf',
+      title: 'Watermark PDF',
+      description: 'Add CONFIDENTIAL, DRAFT or custom text watermarks.',
+    },
+    {
+      href: '/sign-pdf',
+      title: 'Sign PDF',
+      description: 'Add a typed signature and date to your document.',
+    },
+    {
+      href: '/repair-pdf',
+      title: 'Repair PDF',
+      description:
+        'Try to fix a damaged PDF by opening and re-saving it as a fresh file.',
+    },
+  ];
+
+  const securityTools = [
+    {
+      href: '/protect-pdf',
+      title: 'Protect PDF (soft)',
+      description:
+        'Add visible protection labels, owner information and watermarks.',
+    },
+    {
+      href: '/unlock-pdf',
+      title: 'Unlock PDF',
+      description:
+        'Re-save PDFs you already have access to. Does not crack passwords.',
+    },
+  ];
+
+  const imageTools = [
+    {
+      href: '/jpg-to-pdf',
+      title: 'JPG to PDF',
+      description: 'Turn one or more JPG images into a single PDF.',
+    },
+    {
+      href: '/png-to-pdf',
+      title: 'PNG to PDF',
+      description: 'Convert PNG images into a multi-page PDF.',
+    },
+    {
+      href: '/pdf-to-png',
+      title: 'PDF to PNG (page)',
+      description: 'Export a single PDF page as a PNG image.',
+    },
+    {
+      href: '/pdf-to-jpg',
+      title: 'PDF to JPG (page)',
+      description: 'Export a single PDF page as a JPG image.',
+    },
+    {
+      href: '/pdf-to-images',
+      title: 'PDF to images (ZIP)',
+      description: 'Convert all pages to JPG images and download as a ZIP.',
+    },
+  ];
+
+  const textOfficeTools = [
+    {
+      href: '/extract-text',
+      title: 'Extract text from PDF',
+      description: 'Pull out plain text and download it as a .txt file.',
+    },
+    {
+      href: '/pdf-to-word',
+      title: 'PDF to Word (text)',
+      description: 'Convert PDF into a simple text-only Word document.',
+    },
+    {
+      href: '/word-to-pdf',
+      title: 'Word to PDF (text)',
+      description: 'Turn a .docx or .txt file into a text-based PDF.',
+    },
+    {
+      href: '/pdf-to-excel',
+      title: 'PDF to Excel (text)',
+      description: 'Export PDF text lines into Excel rows with page numbers.',
+    },
+    {
+      href: '/excel-to-pdf',
+      title: 'Excel to PDF (text)',
+      description: 'Turn an Excel or CSV file into a text-based PDF.',
+    },
+    {
+      href: '/ocr-to-pdf',
+      title: 'OCR to PDF (searchable)',
+      description: 'Run OCR on a scanned PDF and create a searchable PDF.',
+    },
+    {
+      href: '/html-to-pdf',
+      title: 'HTML to PDF',
+      description: 'Paste simple HTML, preview it and download as a PDF.',
+    },
+  ];
+
+  const filterTools = (tools) =>
+    !q
+      ? tools
+      : tools.filter(
+          (t) =>
+            t.title.toLowerCase().includes(q) ||
+            t.description.toLowerCase().includes(q)
+        );
+
+  const filteredPopular = filterTools(popularTools);
+  const filteredEdit = filterTools(editTools);
+  const filteredSecurity = filterTools(securityTools);
+  const filteredImages = filterTools(imageTools);
+  const filteredTextOffice = filterTools(textOfficeTools);
+
+  const anythingVisible =
+    filteredPopular.length ||
+    filteredEdit.length ||
+    filteredSecurity.length ||
+    filteredImages.length ||
+    filteredTextOffice.length;
+
+  const cardStyle = {
+    position: 'relative',
+    overflow: 'visible',
+    minHeight: '130px',
+  };
+
+  const descStyle = {
+    position: 'relative',
+    zIndex: 2,
+    marginTop: '0.4rem',
+  };
+
   return (
     <>
       <Head>
         <title>PDFFusion – Free Online PDF Tools</title>
         <meta
           name="description"
-          content="PDFFusion offers free, private, in-browser PDF tools: merge, split, compress, convert images, watermark, sign, organize, crop, extract text, and more."
+          content="PDFFusion offers free, private, in-browser PDF tools: merge, split, compress, convert images, add text and more."
         />
       </Head>
 
@@ -32,137 +228,152 @@ export default function HomePage() {
           </nav>
         </header>
 
-        {/* Hero section */}
+        {/* Hero + search */}
         <main className="main">
           <section className="hero">
-            <h2>Work with your PDFs directly in your browser</h2>
+            <h2>All your PDF tools in one simple place</h2>
             <p>
-              No uploads to a server. All tools run in your browser for better
-              privacy. Merge, split, compress, convert and secure your PDFs with
-              one simple interface.
+              Work with your PDFs directly in your browser. No uploads to a
+              server, better privacy, and completely free. Choose a tool below
+              to get started.
             </p>
-          </section>
 
-          {/* Tools grid */}
-          <section className="tool-section">
-            <h3>Popular PDF tools</h3>
-            <div className="tool-grid">
-              {/* Merge / Split / Compress */}
-              <Link href="/merge-pdf" className="tool-card">
-                <h4>Merge PDF</h4>
-                <p>Combine multiple PDFs into a single document.</p>
-              </Link>
-
-              <Link href="/split-pdf" className="tool-card">
-                <h4>Split PDF</h4>
-                <p>Extract specific pages or ranges into a new PDF.</p>
-              </Link>
-
-              <Link href="/compress-pdf" className="tool-card">
-                <h4>Compress PDF</h4>
-                <p>Reduce the file size of your PDF.</p>
-              </Link>
-
-              {/* Rotate / Organize / Crop */}
-              <Link href="/rotate-pdf" className="tool-card">
-                <h4>Rotate PDF</h4>
-                <p>Rotate pages or fix upside-down scans.</p>
-              </Link>
-
-              <Link href="/organize-pdf" className="tool-card">
-                <h4>Organize PDF</h4>
-                <p>Reorder, remove or duplicate pages by choosing an order.</p>
-              </Link>
-
-              <Link href="/crop-pdf" className="tool-card">
-                <h4>Crop PDF</h4>
-                <p>Trim margins and crop all pages at once.</p>
-              </Link>
-
-              {/* Page numbers / Watermark / Sign */}
-              <Link href="/page-numbers" className="tool-card">
-                <h4>Add page numbers</h4>
-                <p>Add page numbers to all pages or a single page.</p>
-              </Link>
-
-              <Link href="/watermark-pdf" className="tool-card">
-                <h4>Watermark PDF</h4>
-                <p>Add CONFIDENTIAL or DRAFT watermarks to every page.</p>
-              </Link>
-
-              <Link href="/sign-pdf" className="tool-card">
-                <h4>Sign PDF</h4>
-                <p>Add a typed signature and date to a chosen page.</p>
-              </Link>
-
-              {/* Image ↔ PDF tools */}
-              <Link href="/jpg-to-pdf" className="tool-card">
-                <h4>JPG to PDF</h4>
-                <p>Turn one or more JPG images into a single PDF.</p>
-              </Link>
-
-              <Link href="/png-to-pdf" className="tool-card">
-                <h4>PNG to PDF</h4>
-                <p>Convert PNG images into a multi-page PDF.</p>
-              </Link>
-
-              <Link href="/pdf-to-png" className="tool-card">
-                <h4>PDF to PNG</h4>
-                <p>Export a single PDF page as a PNG image.</p>
-              </Link>
-
-              <Link href="/pdf-to-excel" className="tool-card">
-                <h4>PDF to Excel (text)</h4>
-                <p>Extract PDF text into Excel with one row per line and page number.</p>
-              </Link>
-
-              <Link href="/ocr-to-pdf" className="tool-card">
-  <h4>OCR to PDF</h4>
-  <p>Run OCR on a scanned PDF and create a text-only searchable PDF.</p>
-</Link>
-
-
-              <Link href="/pdf-to-word" className="tool-card">
-                <h4>PDF to Word (text)</h4>
-                <p>Extract the text from a PDF and download it as a simple Word document.</p>
-              </Link>
-
-
-              <Link href="/pdf-to-jpg" className="tool-card">
-                <h4>PDF to JPG</h4>
-                <p>Export a single PDF page as a JPG image.</p>
-              </Link>
-
-              {/* Security / text tools */}
-              <Link href="/protect-pdf" className="tool-card">
-                <h4>Protect PDF</h4>
-                <p>Add visible protection labels and watermark (soft protection).</p>
-              </Link>
-
-              <Link href="/unlock-pdf" className="tool-card">
-                <h4>Unlock PDF</h4>
-                <p>
-                  Re-save PDFs you already have access to. Does not crack passwords.
-                </p>
-              </Link>
-
-              <Link href="/extract-text" className="tool-card">
-                <h4>Extract text from PDF</h4>
-                <p>
-                  Pull out plain text from your PDF and download it as a .txt file.
-                </p>
-              </Link>
+            <div
+              className="option-row"
+              style={{ marginTop: '1rem', maxWidth: '400px', marginInline: 'auto' }}
+            >
+              <label htmlFor="tool-search" style={{ width: '100%' }}>
+                <strong>Search tools:</strong>
+                <input
+                  id="tool-search"
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="text-input"
+                  placeholder="Type e.g. merge, jpg, rotate, excel…"
+                  style={{ marginTop: '0.4rem', width: '100%' }}
+                />
+              </label>
             </div>
           </section>
 
-          {/* Monetization hint */}
+          {!anythingVisible && (
+            <section className="tool-section">
+              <p className="hint">
+                No tools match &quot;{search}&quot;. Try a different search
+                (for example: merge, split, jpg, word, excel…).
+              </p>
+            </section>
+          )}
+
+          {/* CATEGORY 1 – MOST POPULAR */}
+          {filteredPopular.length > 0 && (
+            <section className="tool-section">
+              <h3>Most popular tools</h3>
+              <div className="tool-grid">
+                {filteredPopular.map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    className="tool-card"
+                    style={cardStyle}
+                  >
+                    <h4>{tool.title}</h4>
+                    <p style={descStyle}>{tool.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* CATEGORY 2 – EDIT & ORGANISE */}
+          {filteredEdit.length > 0 && (
+            <section className="tool-section">
+              <h3>Edit &amp; organise pages</h3>
+              <div className="tool-grid">
+                {filteredEdit.map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    className="tool-card"
+                    style={cardStyle}
+                  >
+                    <h4>{tool.title}</h4>
+                    <p style={descStyle}>{tool.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* CATEGORY 3 – SECURITY */}
+          {filteredSecurity.length > 0 && (
+            <section className="tool-section">
+              <h3>Security &amp; labels</h3>
+              <div className="tool-grid">
+                {filteredSecurity.map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    className="tool-card"
+                    style={cardStyle}
+                  >
+                    <h4>{tool.title}</h4>
+                    <p style={descStyle}>{tool.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* CATEGORY 4 – IMAGES ↔ PDF */}
+          {filteredImages.length > 0 && (
+            <section className="tool-section">
+              <h3>Images &amp; PDF</h3>
+              <div className="tool-grid">
+                {filteredImages.map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    className="tool-card"
+                    style={cardStyle}
+                  >
+                    <h4>{tool.title}</h4>
+                    <p style={descStyle}>{tool.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* CATEGORY 5 – TEXT & OFFICE */}
+          {filteredTextOffice.length > 0 && (
+            <section className="tool-section">
+              <h3>Text &amp; Office conversions</h3>
+              <div className="tool-grid">
+                {filteredTextOffice.map((tool) => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    className="tool-card"
+                    style={cardStyle}
+                  >
+                    <h4>{tool.title}</h4>
+                    <p style={descStyle}>{tool.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* HOW IT WORKS */}
           <section className="tool-section">
             <h3>How PDFFusion works</h3>
             <p className="hint">
               Most tools run entirely in your browser using JavaScript, so your
-              PDFs don&apos;t leave your device. This is great for privacy and
-              lets you later monetise with ads or premium features without
-              storing user files.
+              PDFs don&apos;t leave your device. That&apos;s great for privacy
+              and makes it easy to add ads or premium features later without
+              storing user files on a server.
             </p>
           </section>
         </main>

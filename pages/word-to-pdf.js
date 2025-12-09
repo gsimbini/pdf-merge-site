@@ -2,6 +2,8 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
+import AdBanner from '../components/AdBanner';
+
 
 export default function WordToPdfPage() {
   const [file, setFile] = useState(null);
@@ -168,6 +170,9 @@ export default function WordToPdfPage() {
               browser-only version.
             </p>
 
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
+
             <div className="hint" style={{ marginBottom: '0.75rem' }}>
               Tip: This is great for getting the text into PDF quickly. For
               perfect formatting and images, you&apos;ll need a desktop app or a
@@ -252,9 +257,7 @@ export default function WordToPdfPage() {
               </div>
             )}
 
-            <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 

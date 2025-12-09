@@ -257,6 +257,10 @@ export default function HomePage() {
             </div>
           </section>
 
+          <section className="tool-section">
+            <AdBanner slot="9740145252" />
+          </section>
+
           {!anythingVisible && (
             <section className="tool-section">
               <p className="hint">
@@ -285,6 +289,8 @@ export default function HomePage() {
               </div>
             </section>
           )}
+
+          <section className="tool-section"><AdBanner /></section>
 
           {/* CATEGORY 2 – EDIT & ORGANISE */}
           {filteredEdit.length > 0 && (
@@ -376,6 +382,9 @@ export default function HomePage() {
               storing user files on a server.
             </p>
           </section>
+
+          <AdBanner slot="8164173850" />
+
         </main>
 
         {/* Footer */}

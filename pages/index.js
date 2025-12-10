@@ -202,10 +202,11 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>PDFFusion – Free Online PDF Tools</title>
+        <meta name="google-adsense-account" content="ca-pub-9212010274013202"></meta>
+        <title>SimbaPDF – Free Online PDF Tools</title>
         <meta
           name="description"
-          content="PDFFusion offers free, private, in-browser PDF tools: merge, split, compress, convert images, add text and more."
+          content="SimbaPDF offers free, private, in-browser PDF tools: merge, split, compress, convert images, add text and more."
         />
       </Head>
 
@@ -213,9 +214,9 @@ export default function HomePage() {
         {/* Header */}
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -374,7 +375,7 @@ export default function HomePage() {
 
           {/* HOW IT WORKS */}
           <section className="tool-section">
-            <h3>How PDFFusion works</h3>
+            <h3>How SimbaPDF works</h3>
             <p className="hint">
               Most tools run entirely in your browser using JavaScript, so your
               PDFs don&apos;t leave your device. That&apos;s great for privacy
@@ -389,7 +390,7 @@ export default function HomePage() {
 
         {/* Footer */}
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

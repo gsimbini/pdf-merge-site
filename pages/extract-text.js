@@ -52,41 +52,38 @@ export default function ExtractTextPage() {
       for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
         const content = await page.getTextContent();
-
         const strings = content.items.map((item) => item.str);
         const pageText = strings.join(' ');
 
-        fullText += `\n\n----- Page ${pageNum} -----\n\n`;
-        fullText += pageText;
+        fullText += `\n\n----- Page ${pageNum} -----\n\n${pageText}`;
       }
 
       const trimmed = fullText.trim();
       setPreview(trimmed || '(No extractable text found in this PDF.)');
 
-      // Create and download .txt file
+      // Download as .txt
       const blob = new Blob(
         [trimmed || 'No extractable text found in this PDF.'],
         { type: 'text/plain;charset=utf-8' }
       );
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
+      const baseName = file.name.replace(/\.pdf$/i, '') || 'document';
 
-      const baseName = file.name.replace(/\.pdf$/i, '');
       a.href = url;
       a.download = `${baseName}-extracted-text.txt`;
-
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
 
       setMessage(
-        `Done! Extracted text from ${pdf.numPages} page(s). A .txt file has been downloaded, and a preview is shown below.`
+        `Done! Extracted text from ${pdf.numPages} page(s). A .txt file has been downloaded.`
       );
     } catch (err) {
       console.error(err);
       setMessage(
-        'Something went wrong while extracting text. Some scanned PDFs are just images and need OCR, which this tool does not do.'
+        'Something went wrong while extracting text. Scanned PDFs that are just images need OCR.'
       );
     } finally {
       setProcessing(false);
@@ -96,7 +93,7 @@ export default function ExtractTextPage() {
   return (
     <>
       <Head>
-        <title>Extract Text from PDF - PDFFusion</title>
+        <title>Extract Text from PDF - SimbaPDF</title>
         <meta
           name="description"
           content="Extract plain text from a PDF file directly in your browser, and download it as a .txt file."
@@ -104,27 +101,23 @@ export default function ExtractTextPage() {
         {/* PDF.js from CDN */}
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-          integrity="sha512-tUEqXV2XNY0FTqLL0yxhiYzz0maDCpp1FDZVPBUl49SABLQUeak5ZrdlJVS8cpJbWilUoM1AXW+R9e32XbvA+Q=="
           crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
         ></script>
       </Head>
+
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SP</span>
             <div>
-              <h1>PDFFusion</h1>
-              <p className="tagline">Free &amp; private online PDF tools</p>
+              <h1>SimbaPDF</h1>
+              <p className="tagline">Fast • Free • Secure PDF tools</p>
             </div>
           </div>
           <nav className="nav">
             <Link href="/">Home</Link>
             <Link href="/merge-pdf">Merge PDF</Link>
             <Link href="/extract-text">Extract text</Link>
-            <Link href="/pdf-to-png">PDF to PNG</Link>
-            <Link href="/pdf-to-jpg">PDF to JPG</Link>
-            <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
 
@@ -138,8 +131,7 @@ export default function ExtractTextPage() {
 
             <div className="hint" style={{ marginBottom: '0.75rem' }}>
               Note: If your PDF is a scanned document (only images), this tool
-              won&apos;t see any text. For those, you need OCR (coming later
-              with a server-side engine).
+              won&apos;t see any text. For those, you need OCR.
             </div>
 
             <div
@@ -158,4 +150,76 @@ export default function ExtractTextPage() {
               }
             >
               <p>
-                <strong>Drag &amp; drop</strong> your
+                <strong>Drag &amp; drop</strong> your PDF here, or click to
+                choose.
+              </p>
+              <input
+                id="extract-text-input"
+                type="file"
+                accept="application/pdf"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    setFile(f);
+                    setMessage(
+                      `Selected: ${f.name} (${formatBytes(f.size)})`
+                    );
+                  }
+                }}
+              />
+              {file && (
+                <ul className="file-list">
+                  <li>{file.name}</li>
+                </ul>
+              )}
+            </div>
+
+            <button
+              className="primary-btn"
+              onClick={handleExtract}
+              disabled={!file || processing}
+              style={{ marginTop: '1rem' }}
+            >
+              {processing
+                ? 'Extracting text…'
+                : 'Extract text and download .txt file'}
+            </button>
+
+            {message && (
+              <p className="hint" style={{ marginTop: '0.75rem' }}>
+                {message}
+              </p>
+            )}
+
+            {preview && (
+              <div
+                className="upload-box"
+                style={{
+                  marginTop: '1rem',
+                  maxHeight: '260px',
+                  overflow: 'auto',
+                }}
+              >
+                <strong>Preview:</strong>
+                <pre
+                  style={{
+                    marginTop: '0.5rem',
+                    fontSize: '0.85rem',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {preview}
+                </pre>
+              </div>
+            )}
+          </section>
+        </main>
+
+        <footer className="footer">
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
+        </footer>
+      </div>
+    </>
+  );
+}

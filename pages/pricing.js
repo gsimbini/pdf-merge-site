@@ -7,9 +7,47 @@ import AdBanner from "../components/AdBanner";
 export default function PricingPage() {
   const [billing, setBilling] = useState("monthly"); // "monthly" | "yearly"
 
+  async function goPayFast(plan) {
+    try {
+      const res = await fetch("/api/payfast/init", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }), // "monthly" or "yearly"
+      });
+
+      const payload = await res.json();
+
+      if (!res.ok) {
+        alert(payload?.error || "Could not start PayFast checkout.");
+        return;
+      }
+
+      const { payfastUrl, data } = payload;
+
+      // PayFast expects a POST form submit
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = payfastUrl;
+
+      Object.keys(data).forEach((key) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = String(data[key]);
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+    } catch (err) {
+      console.error(err);
+      alert("Network error starting PayFast checkout.");
+    }
+  }
+
   const plans = useMemo(() => {
     const proMonthly = 49; // ZAR
-    const proYearly = 490; // ZAR (2 months free-ish)
+    const proYearly = 490; // ZAR
 
     return [
       {
@@ -23,7 +61,7 @@ export default function PricingPage() {
           "No signup required",
           "Ads supported",
         ],
-        cta: { label: "Use Free Tools", href: "/" },
+        cta: { label: "Use Free Tools", onClick: () => (window.location.href = "/") },
         highlight: false,
       },
       {
@@ -38,13 +76,9 @@ export default function PricingPage() {
           "Early access to new tools",
           "Priority support",
         ],
-        // For now: “works” by opening email. You can replace with Stripe/PayFast later.
         cta: {
-          label: billing === "monthly" ? "Go Pro (Monthly)" : "Go Pro (Yearly)",
-          href:
-            "mailto:support@simbapdf.com?subject=SimbaPDF%20Pro%20Subscription&body=Hi%20SimbaPDF%20team,%0A%0AI%20want%20to%20subscribe%20to%20SimbaPDF%20Pro%20(" +
-            (billing === "monthly" ? "Monthly" : "Yearly") +
-            ").%0A%0APlease%20send%20me%20payment%20instructions%20and%20activation%20steps.%0A%0AThanks!",
+          label: billing === "monthly" ? "Go Pro – Monthly (PayFast)" : "Go Pro – Yearly (PayFast)",
+          onClick: () => goPayFast(billing === "monthly" ? "monthly" : "yearly"),
         },
         highlight: true,
       },
@@ -88,26 +122,28 @@ export default function PricingPage() {
               If you want a cleaner experience, go Pro.
             </p>
 
-            {/* Optional: Homepage/marketing ad slot or footer slot */}
+            {/* Optional: Homepage/marketing ad slot */}
             <AdBanner slot="9740145252" />
 
+            {/* Billing Toggle */}
             <div className="pricing-toggle" style={{ marginTop: "1rem" }}>
               <button
+                type="button"
                 className={billing === "monthly" ? "toggle-btn active" : "toggle-btn"}
                 onClick={() => setBilling("monthly")}
-                type="button"
               >
                 Monthly
               </button>
               <button
+                type="button"
                 className={billing === "yearly" ? "toggle-btn active" : "toggle-btn"}
                 onClick={() => setBilling("yearly")}
-                type="button"
               >
                 Yearly (save)
               </button>
             </div>
 
+            {/* Cards */}
             <div className="pricing-grid" style={{ marginTop: "1rem" }}>
               {plans.map((p) => (
                 <div
@@ -140,14 +176,14 @@ export default function PricingPage() {
                     </ul>
                   </div>
 
-                  <a className="primary-btn" href={p.cta.href}>
+                  {/* CTA */}
+                  <button className="primary-btn" type="button" onClick={p.cta.onClick}>
                     {p.cta.label}
-                  </a>
+                  </button>
 
                   {p.name === "Pro" && (
                     <p className="hint" style={{ marginTop: "0.75rem" }}>
                       After payment, we’ll activate Pro for your account/device.
-                      (Payments integration can be added next.)
                     </p>
                   )}
                 </div>

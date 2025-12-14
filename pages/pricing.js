@@ -1,8 +1,9 @@
 // pages/pricing.js
 import Head from "next/head";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import AdBanner from "../components/AdBanner";
+
 
 export default function PricingPage() {
   const [billing, setBilling] = useState("monthly"); // "monthly" | "yearly"

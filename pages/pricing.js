@@ -6,25 +6,34 @@ import AdBanner from "../components/AdBanner";
 
 export default function PricingPage() {
   const [billing, setBilling] = useState("monthly"); // "monthly" | "yearly"
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
 
   async function goPayFast(plan) {
     try {
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+        alert("Please enter a valid email for Pro activation.");
+        return;
+      }
+
+      setBusy(true);
+
       const res = await fetch("/api/payfast/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }), // "monthly" or "yearly"
+        body: JSON.stringify({ plan, email }),
       });
 
       const payload = await res.json();
 
       if (!res.ok) {
         alert(payload?.error || "Could not start PayFast checkout.");
+        setBusy(false);
         return;
       }
 
       const { payfastUrl, data } = payload;
 
-      // PayFast expects a POST form submit
       const form = document.createElement("form");
       form.method = "POST";
       form.action = payfastUrl;
@@ -42,18 +51,18 @@ export default function PricingPage() {
     } catch (err) {
       console.error(err);
       alert("Network error starting PayFast checkout.");
+      setBusy(false);
     }
   }
 
   const plans = useMemo(() => {
-    const proMonthly = 49; // ZAR
-    const proYearly = 490; // ZAR
+    const proMonthly = 49;
+    const proYearly = 490;
 
     return [
       {
         name: "Free",
         price: 0,
-        period: billing,
         tagline: "Perfect for occasional use",
         features: [
           "All basic PDF tools",
@@ -61,13 +70,11 @@ export default function PricingPage() {
           "No signup required",
           "Ads supported",
         ],
-        cta: { label: "Use Free Tools", onClick: () => (window.location.href = "/") },
         highlight: false,
       },
       {
         name: "Pro",
         price: billing === "monthly" ? proMonthly : proYearly,
-        period: billing,
         tagline: "For daily work and faster flow",
         features: [
           "Remove ads",
@@ -76,10 +83,6 @@ export default function PricingPage() {
           "Early access to new tools",
           "Priority support",
         ],
-        cta: {
-          label: billing === "monthly" ? "Go Pro – Monthly (PayFast)" : "Go Pro – Yearly (PayFast)",
-          onClick: () => goPayFast(billing === "monthly" ? "monthly" : "yearly"),
-        },
         highlight: true,
       },
     ];
@@ -122,15 +125,39 @@ export default function PricingPage() {
               If you want a cleaner experience, go Pro.
             </p>
 
-            {/* Optional: Homepage/marketing ad slot */}
             <AdBanner slot="9740145252" />
 
-            {/* Billing Toggle */}
+            {/* Email for activation */}
+            <div className="upload-box" style={{ marginTop: "1rem" }}>
+              <strong>Pro activation email</strong>
+              <p className="hint" style={{ marginTop: "0.35rem" }}>
+                Enter the email that will be activated after PayFast confirms payment (ITN COMPLETE).
+              </p>
+
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "0.75rem",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  background: "rgba(255,255,255,0.03)",
+                  color: "inherit",
+                  marginTop: "0.75rem",
+                }}
+              />
+            </div>
+
+            {/* Billing toggle */}
             <div className="pricing-toggle" style={{ marginTop: "1rem" }}>
               <button
                 type="button"
                 className={billing === "monthly" ? "toggle-btn active" : "toggle-btn"}
                 onClick={() => setBilling("monthly")}
+                disabled={busy}
               >
                 Monthly
               </button>
@@ -138,12 +165,34 @@ export default function PricingPage() {
                 type="button"
                 className={billing === "yearly" ? "toggle-btn active" : "toggle-btn"}
                 onClick={() => setBilling("yearly")}
+                disabled={busy}
               >
                 Yearly (save)
               </button>
             </div>
 
-            {/* Cards */}
+            {/* Quick PayFast buttons */}
+            <div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+              <button
+                className="primary-btn"
+                type="button"
+                onClick={() => goPayFast("monthly")}
+                disabled={busy}
+              >
+                {busy ? "Starting checkout…" : "Go Pro – Monthly (PayFast)"}
+              </button>
+
+              <button
+                className="primary-btn"
+                type="button"
+                onClick={() => goPayFast("yearly")}
+                disabled={busy}
+              >
+                {busy ? "Starting checkout…" : "Go Pro – Yearly (PayFast)"}
+              </button>
+            </div>
+
+            {/* Pricing cards */}
             <div className="pricing-grid" style={{ marginTop: "1rem" }}>
               {plans.map((p) => (
                 <div
@@ -158,10 +207,10 @@ export default function PricingPage() {
 
                     <div className="price">
                       <span className="amount">
-                        {p.price === 0 ? "R0" : `R${p.price}`}
+                        {p.name === "Free" ? "R0" : billing === "monthly" ? "R49" : "R490"}
                       </span>
                       <span className="period">
-                        {p.price === 0
+                        {p.name === "Free"
                           ? "/ forever"
                           : billing === "monthly"
                           ? "/ month"
@@ -176,14 +225,26 @@ export default function PricingPage() {
                     </ul>
                   </div>
 
-                  {/* CTA */}
-                  <button className="primary-btn" type="button" onClick={p.cta.onClick}>
-                    {p.cta.label}
-                  </button>
+                  {p.name === "Free" ? (
+                    <Link className="primary-btn" href="/">
+                      Use Free Tools
+                    </Link>
+                  ) : (
+                    <button
+                      className="primary-btn"
+                      type="button"
+                      onClick={() => goPayFast(billing === "monthly" ? "monthly" : "yearly")}
+                      disabled={busy}
+                    >
+                      {billing === "monthly"
+                        ? "Go Pro – Monthly (PayFast)"
+                        : "Go Pro – Yearly (PayFast)"}
+                    </button>
+                  )}
 
                   {p.name === "Pro" && (
                     <p className="hint" style={{ marginTop: "0.75rem" }}>
-                      After payment, we’ll activate Pro for your account/device.
+                      Pro is activated only after PayFast ITN confirms <b>COMPLETE</b>.
                     </p>
                   )}
                 </div>
@@ -197,16 +258,11 @@ export default function PricingPage() {
                   <b>Does Pro remove ads?</b> Yes — that’s the main benefit.
                 </p>
                 <p className="hint" style={{ margin: "0.25rem 0" }}>
-                  <b>Can I cancel?</b> Yes. If you subscribe monthly, you can stop anytime.
-                </p>
-                <p className="hint" style={{ margin: "0.25rem 0" }}>
-                  <b>Do you store my PDFs?</b> Most tools run in-browser; if a tool
-                  ever uses server-side processing, we’ll make it clear.
+                  <b>When is Pro activated?</b> Only after PayFast confirms payment via ITN (COMPLETE).
                 </p>
               </div>
             </div>
 
-            {/* Footer ad (optional) */}
             <AdBanner slot="8164173850" />
           </section>
         </main>

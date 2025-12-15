@@ -1,34 +1,52 @@
 // components/MagicLinkLogin.js
-import { useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { useEffect, useState } from "react";
+import { getSupabase } from "../lib/supabaseClient";
 
 export default function MagicLinkLogin() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    // Avoid SSR issues
+    setReady(true);
+  }, []);
 
   async function sendLink() {
     setError("");
+
+    if (typeof window === "undefined") return;
 
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       setError("Please enter a valid email.");
       return;
     }
 
-    const { error } = await supabase.auth.signInWithOtp({
+    const supabase = getSupabase();
+    if (!supabase) {
+      setError(
+        "Login is temporarily unavailable (Supabase is not configured on this deployment)."
+      );
+      return;
+    }
+
+    const { error: signInError } = await supabase.auth.signInWithOtp({
       email,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
-    if (error) {
-      setError(error.message);
+    if (signInError) {
+      setError(signInError.message);
     } else {
       setSent(true);
       localStorage.setItem("simbapdf_email", email.toLowerCase());
     }
   }
+
+  if (!ready) return null;
 
   if (sent) {
     return (
@@ -44,9 +62,7 @@ export default function MagicLinkLogin() {
   return (
     <div className="upload-box">
       <strong>Sign in to SimbaPDF</strong>
-      <p className="hint">
-        Enter your email to receive a secure magic login link.
-      </p>
+      <p className="hint">Enter your email to receive a secure magic login link.</p>
 
       <input
         type="email"
@@ -56,9 +72,18 @@ export default function MagicLinkLogin() {
         style={{ width: "100%", marginTop: "0.5rem" }}
       />
 
-      {error && <p className="hint" style={{ color: "#ff6b6b" }}>{error}</p>}
+      {error && (
+        <p className="hint" style={{ color: "#ff6b6b", marginTop: "0.5rem" }}>
+          {error}
+        </p>
+      )}
 
-      <button className="primary-btn" onClick={sendLink} style={{ marginTop: "0.75rem" }}>
+      <button
+        className="primary-btn"
+        onClick={sendLink}
+        style={{ marginTop: "0.75rem" }}
+        type="button"
+      >
         Send Magic Link
       </button>
     </div>

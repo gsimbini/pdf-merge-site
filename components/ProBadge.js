@@ -1,20 +1,10 @@
 // components/ProBadge.js
-import { useEffect, useState } from "react";
 import useProStatus from "./useProStatus";
 
 export default function ProBadge() {
-  const [email, setEmail] = useState("");
+  const { isPro, loading } = useProStatus();
 
-  useEffect(() => {
-    const saved =
-      typeof window !== "undefined"
-        ? localStorage.getItem("simbapdf_email")
-        : "";
-    if (saved) setEmail(saved);
-  }, []);
-
-  const { isPro, loading } = useProStatus(email);
-
+  // Do not render anything while loading or if not Pro
   if (loading || !isPro) return null;
 
   return (
@@ -28,9 +18,11 @@ export default function ProBadge() {
         background: "rgba(46, 204, 113, 0.15)",
         color: "#2ecc71",
         fontSize: "0.85rem",
-        fontWeight: 600,
+        fontWeight: 700,
         border: "1px solid rgba(46, 204, 113, 0.35)",
+        whiteSpace: "nowrap",
       }}
+      title="Your Pro subscription is active"
     >
       ✅ Pro Active
     </div>

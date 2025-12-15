@@ -1,5 +1,5 @@
 {
-  "name": "pdf-fusion-site",
+  "name": "simba-pdf-site",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.87.1",
     "next": "14.0.4",
     "pdf-lib": "^1.17.1",
     "react": "18.2.0",

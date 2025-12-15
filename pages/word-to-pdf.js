@@ -3,6 +3,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
 
 
 export default function WordToPdfPage() {
@@ -124,7 +126,7 @@ export default function WordToPdfPage() {
   return (
     <>
       <Head>
-        <title>Word to PDF (Text only) - PDFFusion</title>
+        <title>Word to PDF (Text only) - SimbaPDF</title>
         <meta
           name="description"
           content="Convert a Word (.docx) or text (.txt) file to a simple text-based PDF directly in your browser."
@@ -148,7 +150,7 @@ export default function WordToPdfPage() {
           <div className="brand">
             <span className="logo-circle">PF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -160,6 +162,11 @@ export default function WordToPdfPage() {
             <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
+
+        <div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
 
         <main className="main">
           <section className="tool-section">
@@ -262,7 +269,7 @@ export default function WordToPdfPage() {
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

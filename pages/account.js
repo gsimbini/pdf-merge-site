@@ -2,80 +2,103 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { getSupabase } from "../lib/supabaseClient";
+import useProStatus from "../components/useProStatus";
+import LogoutButton from "../components/LogoutButton";
+import ProBadge from "../components/ProBadge";
+import AdBanner from "../components/AdBanner";
 
 export default function AccountPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [sessionReady, setSessionReady] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState("unknown"); // active | none | inactive | unknown
-  const [plan, setPlan] = useState(null); // monthly | yearly | null
-  const [updatedAt, setUpdatedAt] = useState(null);
-  const [error, setError] = useState("");
+  const [ready, setReady] = useState(false);
+
+  const { isPro, loading: proLoading } = useProStatus();
 
   useEffect(() => {
-    async function init() {
-      const { data } = await supabase.auth.getSession();
-      const userEmail = data?.session?.user?.email?.toLowerCase() || "";
-      setEmail(userEmail);
-      setSessionReady(true);
+    if (typeof window === "undefined") return;
 
-      // If not logged in, just stop here (page will show login prompt)
-      if (!userEmail) return;
-
-      await refresh(userEmail);
+    const supabase = getSupabase();
+    if (!supabase) {
+      setReady(true);
+      return;
     }
 
-    init();
-
-    // Keep it in sync if user logs in/out
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const e = session?.user?.email?.toLowerCase() || "";
+    // Initial session
+    supabase.auth.getSession().then(({ data }) => {
+      const e = data?.session?.user?.email?.toLowerCase() || "";
       setEmail(e);
-      if (!e) {
-        setStatus("none");
-        setPlan(null);
-        setUpdatedAt(null);
-      } else {
-        refresh(e);
-      }
+      if (e) localStorage.setItem("simbapdf_email", e);
+      setReady(true);
     });
 
-    return () => sub?.subscription?.unsubscribe?.();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Auth state listener
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        const e = session?.user?.email?.toLowerCase() || "";
+        setEmail(e);
+
+        if (e) {
+          localStorage.setItem("simbapdf_email", e);
+        } else {
+          localStorage.removeItem("simbapdf_email");
+        }
+      }
+    );
+
+    return () => {
+      subscription?.subscription?.unsubscribe();
+    };
   }, []);
 
-  async function refresh(userEmail) {
-    setLoading(true);
-    setError("");
+  if (!ready) return null;
 
-    try {
-      const res = await fetch(`/api/pro/status?email=${encodeURIComponent(userEmail)}`);
-      const data = await res.json();
+  if (!email) {
+    return (
+      <>
+        <Head>
+          <title>Account - SimbaPDF</title>
+        </Head>
 
-      if (!res.ok) throw new Error(data?.error || "Failed to load subscription status");
+        <div className="page">
+          <header className="header">
+            <div className="brand">
+              <span className="logo-circle">SP</span>
+              <div>
+                <h1>SimbaPDF</h1>
+                <p className="tagline">Account</p>
+              </div>
+            </div>
 
-      setStatus(data?.isPro ? "active" : (data?.status || "none"));
-      setPlan(data?.plan || null);
-      setUpdatedAt(data?.updated_at || null);
-    } catch (e) {
-      setError(e.message || "Error");
-    } finally {
-      setLoading(false);
-    }
-  }
+            <nav className="nav">
+              <Link href="/">Home</Link>
+              <Link href="/pricing">Pricing</Link>
+              <Link href="/login">Login</Link>
+            </nav>
+          </header>
 
-  async function logout() {
-    await supabase.auth.signOut();
-    localStorage.removeItem("simbapdf_email");
-    window.location.href = "/";
+          <main className="main">
+            <section className="tool-section">
+              <h2>You’re not signed in</h2>
+              <p className="hint">
+                Please log in to view your account and subscription status.
+              </p>
+
+              <Link className="primary-btn" href="/login">
+                Go to Login
+              </Link>
+            </section>
+          </main>
+        </div>
+      </>
+    );
   }
 
   return (
     <>
       <Head>
         <title>Account - SimbaPDF</title>
-        <meta name="description" content="Manage your SimbaPDF account and subscription." />
       </Head>
 
       <div className="page">
@@ -84,104 +107,53 @@ export default function AccountPage() {
             <span className="logo-circle">SP</span>
             <div>
               <h1>SimbaPDF</h1>
-              <p className="tagline">Account & Subscription</p>
+              <p className="tagline">Your Account</p>
             </div>
           </div>
 
-          <nav className="nav">
-            <Link href="/">Home</Link>
-            <Link href="/pricing">Pricing</Link>
-            <Link href="/account">Account</Link>
-          </nav>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <nav className="nav">
+              <Link href="/">Home</Link>
+              <Link href="/pricing">Pricing</Link>
+              <Link href="/account">Account</Link>
+            </nav>
+            <ProBadge />
+          </div>
         </header>
 
         <main className="main">
           <section className="tool-section">
-            <h2>Manage Subscription</h2>
+            <h2>Account</h2>
 
-            {!sessionReady ? (
-              <div className="upload-box">
-                <strong>Loading…</strong>
-                <p className="hint">Checking your session.</p>
-              </div>
-            ) : !email ? (
-              <div className="upload-box">
-                <strong>You’re not signed in</strong>
-                <p className="hint">
-                  Please sign in using a magic link on the Pricing page, then come back here.
-                </p>
-                <Link className="primary-btn" href="/pricing">
-                  Go to Pricing / Sign in
+            <div className="upload-box">
+              <strong>Email</strong>
+              <p className="hint" style={{ marginTop: "0.35rem" }}>
+                {email}
+              </p>
+            </div>
+
+            <div className="upload-box" style={{ marginTop: "1rem" }}>
+              <strong>Subscription</strong>
+              <p className="hint" style={{ marginTop: "0.35rem" }}>
+                {proLoading
+                  ? "Checking status…"
+                  : isPro
+                  ? "✅ Pro Active"
+                  : "Free plan (ads enabled)"}
+              </p>
+
+              {!isPro && (
+                <Link className="primary-btn" href="/pricing" style={{ marginTop: "0.75rem" }}>
+                  Upgrade to Pro
                 </Link>
-              </div>
-            ) : (
-              <>
-                <div className="upload-box">
-                  <strong>Signed in as</strong>
-                  <p className="hint" style={{ marginTop: "0.35rem" }}>
-                    {email}
-                  </p>
+              )}
+            </div>
 
-                  <div style={{ marginTop: "0.75rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-                    <button className="primary-btn" type="button" onClick={() => refresh(email)} disabled={loading}>
-                      {loading ? "Refreshing…" : "Refresh status"}
-                    </button>
-                    <button className="secondary-btn" type="button" onClick={logout}>
-                      Log out
-                    </button>
-                  </div>
+            <div style={{ marginTop: "1rem" }}>
+              <LogoutButton />
+            </div>
 
-                  {error && (
-                    <p className="hint" style={{ marginTop: "0.75rem", color: "#ff6b6b" }}>
-                      {error}
-                    </p>
-                  )}
-                </div>
-
-                <div className="upload-box" style={{ marginTop: "1rem" }}>
-                  <strong>Subscription status</strong>
-
-                  <div style={{ marginTop: "0.6rem" }}>
-                    <p className="hint" style={{ margin: "0.25rem 0" }}>
-                      <b>Status:</b>{" "}
-                      {status === "active" ? "✅ Pro Active" : status === "inactive" ? "Inactive" : "Not Pro"}
-                    </p>
-
-                    <p className="hint" style={{ margin: "0.25rem 0" }}>
-                      <b>Plan:</b> {plan ? plan : "—"}
-                    </p>
-
-                    <p className="hint" style={{ margin: "0.25rem 0" }}>
-                      <b>Last updated:</b> {updatedAt ? new Date(updatedAt).toLocaleString() : "—"}
-                    </p>
-                  </div>
-
-                  {status !== "active" && (
-                    <div style={{ marginTop: "0.75rem" }}>
-                      <Link className="primary-btn" href="/pricing">
-                        Upgrade to Pro
-                      </Link>
-                    </div>
-                  )}
-                </div>
-
-                <div className="upload-box" style={{ marginTop: "1rem" }}>
-                  <strong>Cancel / Manage billing</strong>
-                  <p className="hint" style={{ marginTop: "0.5rem" }}>
-                    PayFast subscriptions can be managed depending on how the subscription was created.
-                    If you need cancellation help, email us from your Pro email address and we’ll assist.
-                  </p>
-
-                  <p className="hint" style={{ marginTop: "0.5rem" }}>
-                    Email: <b>support@simbapdf.com</b> (subject: “Cancel Pro”)
-                  </p>
-
-                  <p className="hint" style={{ marginTop: "0.5rem" }}>
-                    Tip: include your email and the words “SimbaPDF Pro” so we can locate your subscription quickly.
-                  </p>
-                </div>
-              </>
-            )}
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 

@@ -3,6 +3,9 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
+
 
 export default function HomePage() {
   const [search, setSearch] = useState('');
@@ -223,11 +226,18 @@ export default function HomePage() {
           <nav className="nav">
             <Link href="/">Home</Link>
             <Link href="/pricing">Pricing</Link>
-            <Link href="/merge-pdf">Merge PDF</Link>
-            <Link href="/jpg-to-pdf">JPG to PDF</Link>
-            <Link href="/png-to-pdf">PNG to PDF</Link>
-          </nav>
+            <Link href="/login">Login</Link>
+            <Link href="/account">Account</Link>
+            </nav>
+          
+
         </header>
+
+
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
 
         {/* Hero + search */}
         <main className="main">

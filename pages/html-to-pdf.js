@@ -3,11 +3,13 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useRef } from 'react';
 import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
 
 
 export default function HtmlToPdfPage() {
   const [htmlInput, setHtmlInput] = useState(
-    `<h1 style="text-align:center;">Hello from PDFFusion</h1>
+    `<h1 style="text-align:center;">Hello from SimbaPDF</h1>
 <p>This is a simple example of <strong>HTML to PDF</strong>.</p>
 <ul>
   <li>You can use headings, paragraphs and lists.</li>
@@ -103,10 +105,10 @@ export default function HtmlToPdfPage() {
   return (
     <>
       <Head>
-        <title>HTML to PDF - PDFFusion</title>
+        <title>HTML to PDF - SimbaPDF</title>
         <meta
           name="description"
-          content="Convert simple HTML content into a PDF directly in your browser using PDFFusion."
+          content="Convert simple HTML content into a PDF directly in your browser using SimbaPDF."
         />
         {/* html2canvas for rendering HTML to canvas */}
         <script
@@ -125,9 +127,9 @@ export default function HtmlToPdfPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -140,6 +142,11 @@ export default function HtmlToPdfPage() {
             <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
+
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
 
         <main className="main">
           <section className="tool-section">
@@ -215,14 +222,12 @@ export default function HtmlToPdfPage() {
               </p>
             )}
 
-            <div className="ad-slot" style={{ marginTop: '1rem' }}>
-              <strong><AdBanner /></strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

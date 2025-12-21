@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
 
 
 export default function PdfToPdfaPage() {
@@ -73,13 +74,13 @@ export default function PdfToPdfaPage() {
       const now = new Date();
 
       pdfDoc.setTitle(`${baseName} (archival copy)`);
-      pdfDoc.setSubject('Basic PDF/A-style archival copy created by PDFFusion');
+      pdfDoc.setSubject('Basic PDF/A-style archival copy created by SimbaPDF');
       pdfDoc.setAuthor('');
-      pdfDoc.setCreator('PDFFusion (browser tools)');
-      pdfDoc.setProducer('PDFFusion – Browser-based PDF tools');
+      pdfDoc.setCreator('SimbaPDF (browser tools)');
+      pdfDoc.setProducer('SimbaPDF – Browser-based PDF tools');
       pdfDoc.setCreationDate(now);
       pdfDoc.setModificationDate(now);
-      pdfDoc.setKeywords(['PDF', 'PDFFusion', 'archival', 'PDF/A-like']);
+      pdfDoc.setKeywords(['PDF', 'SimbaPDF', 'archival', 'PDF/A-like']);
       pdfDoc.setLanguage('en-ZA');
 
       // NOTE: This does NOT guarantee formal ISO PDF/A compliance.
@@ -120,26 +121,21 @@ export default function PdfToPdfaPage() {
   return (
     <>
       <Head>
-        <title>PDF to PDF/A (basic archive) - PDFFusion</title>
+        <title>PDF to PDF/A (basic archive) - SimbaPDF</title>
         <meta
           name="description"
-          content="Create a simple archival-style PDF copy (PDF/A-like) directly in your browser with PDFFusion."
+          content="Create a simple archival-style PDF copy (PDF/A-like) directly in your browser with SimbaPDF."
         />
-        {/* pdf-lib from CDN */}
-        <script
-          src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        ></script>
+       
       </Head>
 
       <div className="page">
         {/* Header */}
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -151,6 +147,11 @@ export default function PdfToPdfaPage() {
             <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
+
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
 
         {/* Main */}
         <main className="main">
@@ -169,6 +170,9 @@ export default function PdfToPdfaPage() {
               should still test the output with a dedicated PDF/A validator or
               use professional desktop software.
             </div>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div
               className="upload-box dropzone"
@@ -236,16 +240,14 @@ export default function PdfToPdfaPage() {
               </p>
             )}
 
-                        <div className="ad-slot">
-                          <strong><AdBanner /></strong> Place a banner or AdSense block here.
-                        </div>
+            <AdBanner slot="8164173850" />
             
           </section>
         </main>
 
         {/* Footer */}
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

@@ -2,6 +2,10 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
+import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
+
 
 export default function PdfToExcelPage() {
   const [file, setFile] = useState(null);
@@ -142,7 +146,7 @@ export default function PdfToExcelPage() {
   return (
     <>
       <Head>
-        <title>PDF to Excel (Text to rows) - PDFFusion</title>
+        <title>PDF to Excel (Text to rows) - SimbaPDF</title>
         <meta
           name="description"
           content="Convert a PDF into an Excel file by extracting text lines per page into rows. Browser-only, no uploads."
@@ -165,9 +169,9 @@ export default function PdfToExcelPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -179,6 +183,11 @@ export default function PdfToExcelPage() {
             <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
+
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
 
         <main className="main">
           <section className="tool-section">
@@ -193,6 +202,9 @@ export default function PdfToExcelPage() {
               Works best on PDFs that contain real text. Scanned PDFs (images)
               need OCR, which this browser-only version does not include.
             </div>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div
               className="upload-box dropzone"
@@ -321,14 +333,12 @@ export default function PdfToExcelPage() {
               </div>
             )}
 
-            <div className="ad-slot" style={{ marginTop: '1rem' }}>
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

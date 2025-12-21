@@ -3,6 +3,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
 
 
 export default function PdfToPowerPointPage() {
@@ -142,7 +144,7 @@ export default function PdfToPowerPointPage() {
   return (
     <>
       <Head>
-        <title>PDF to PowerPoint (text slides) - PDFFusion</title>
+        <title>PDF to PowerPoint (text slides) - SimbaPDF</title>
         <meta
           name="description"
           content="Convert a PDF into a simple PowerPoint file where each page becomes a text slide, directly in your browser."
@@ -166,9 +168,9 @@ export default function PdfToPowerPointPage() {
         {/* Header */}
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -180,6 +182,11 @@ export default function PdfToPowerPointPage() {
             <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
+
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
 
         {/* Main */}
         <main className="main">
@@ -196,6 +203,9 @@ export default function PdfToPowerPointPage() {
               (images) should be processed with OCR first using the &quot;OCR
               to PDF&quot; tool, then converted here.
             </div>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div
               className="upload-box dropzone"
@@ -286,15 +296,13 @@ export default function PdfToPowerPointPage() {
               </div>
             )}
 
-            <div className="ad-slot">
-                          <strong><AdBanner /></strong> Place a banner or AdSense block here.
-                        </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         {/* Footer */}
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

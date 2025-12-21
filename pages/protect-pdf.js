@@ -3,6 +3,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
+import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
+
 
 export default function ProtectPdfPage() {
   const [file, setFile] = useState(null);
@@ -48,7 +52,7 @@ export default function ProtectPdfPage() {
       }
 
       // Set some basic metadata
-      const safeOwner = ownerName.trim() || 'Protected by PDFFusion';
+      const safeOwner = ownerName.trim() || 'Protected by SimbaPDF';
       pdfDoc.setAuthor(safeOwner);
       pdfDoc.setTitle(`Protected PDF - ${file.name}`);
       pdfDoc.setSubject(note);
@@ -139,7 +143,7 @@ export default function ProtectPdfPage() {
   return (
     <>
       <Head>
-        <title>Protect PDF (Soft protection) - PDFFusion</title>
+        <title>Protect PDF (Soft protection) - SimbaPDF</title>
         <meta
           name="description"
           content="Add visible protection labels, ownership info and watermark to your PDF. Does not perform strong password encryption."
@@ -148,9 +152,9 @@ export default function ProtectPdfPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -163,6 +167,11 @@ export default function ProtectPdfPage() {
           </nav>
         </header>
 
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>Protect PDF (Soft protection)</h2>
@@ -172,6 +181,9 @@ export default function ProtectPdfPage() {
               confidential, but does <strong>not</strong> encrypt it with a
               password.
             </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div className="hint" style={{ marginBottom: '0.75rem' }}>
               For true password-based encryption, you&apos;ll need a server-side
@@ -280,14 +292,12 @@ export default function ProtectPdfPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

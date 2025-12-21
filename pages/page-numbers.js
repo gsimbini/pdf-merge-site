@@ -3,6 +3,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
+import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
+
 
 export default function PageNumbersPage() {
   const [file, setFile] = useState(null);
@@ -131,7 +135,7 @@ export default function PageNumbersPage() {
   return (
     <>
       <Head>
-        <title>Add Page Numbers to PDF - PDFFusion</title>
+        <title>Add Page Numbers to PDF - SimbaPDF</title>
         <meta
           name="description"
           content="Add page numbers to your PDF document quickly and easily."
@@ -140,9 +144,9 @@ export default function PageNumbersPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -155,6 +159,11 @@ export default function PageNumbersPage() {
           </nav>
         </header>
 
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>Add Page Numbers</h2>
@@ -163,6 +172,8 @@ export default function PageNumbersPage() {
               single page (for example, only page 1).
             </p>
 
+          {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
             <div className="option-row">
               <label htmlFor="starting-number">
                 <strong>Number to add:</strong>
@@ -295,14 +306,12 @@ export default function PageNumbersPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

@@ -3,6 +3,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
+
 
 export default function OrganizePdfPage() {
   const [file, setFile] = useState(null);
@@ -121,7 +125,7 @@ export default function OrganizePdfPage() {
   return (
     <>
       <Head>
-        <title>Organize PDF - PDFFusion</title>
+        <title>Organize PDF - SimbaPDF</title>
         <meta
           name="description"
           content="Reorder, remove or duplicate pages in your PDF by choosing the exact page order."
@@ -130,9 +134,9 @@ export default function OrganizePdfPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -145,6 +149,11 @@ export default function OrganizePdfPage() {
           </nav>
         </header>
 
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>Organize PDF</h2>
@@ -152,6 +161,9 @@ export default function OrganizePdfPage() {
               Change the order of pages in your PDF, remove pages or duplicate them
               by choosing the desired page order.
             </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div className="option-row">
               <label htmlFor="order-spec">
@@ -212,7 +224,6 @@ export default function OrganizePdfPage() {
                 </ul>
               )}
             </div>
-
             <button
               className="primary-btn"
               onClick={handleOrganize}
@@ -228,14 +239,12 @@ export default function OrganizePdfPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

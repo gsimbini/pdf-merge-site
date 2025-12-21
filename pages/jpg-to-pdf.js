@@ -3,6 +3,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
+
 
 export default function JpgToPdfPage() {
   const [files, setFiles] = useState([]);
@@ -118,7 +122,7 @@ export default function JpgToPdfPage() {
   return (
     <>
       <Head>
-        <title>JPG to PDF - PDFFusion</title>
+        <title>JPG to PDF - SimbaPDF</title>
         <meta
           name="description"
           content="Convert JPG and PNG images to a multi-page PDF document."
@@ -127,9 +131,9 @@ export default function JpgToPdfPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -142,6 +146,12 @@ export default function JpgToPdfPage() {
           </nav>
         </header>
 
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
+
         <main className="main">
           <section className="tool-section">
             <h2>JPG / PNG to PDF</h2>
@@ -149,6 +159,9 @@ export default function JpgToPdfPage() {
               Turn one or more images into a single PDF. Each image becomes its
               own page, centered and scaled to fit.
             </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div
               className="upload-box dropzone"
@@ -200,14 +213,12 @@ export default function JpgToPdfPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

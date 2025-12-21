@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
+
 
 export default function MergePdfPage() {
     useEffect(() => {
@@ -93,7 +97,7 @@ export default function MergePdfPage() {
   return (
     <>
       <Head>
-        <title>Merge PDF - PDFFusion</title>
+        <title>Merge PDF - SimbaPDF</title>
         <meta
           name="description"
           content="Merge multiple PDF files into a single document for free. No registration required."
@@ -102,9 +106,9 @@ export default function MergePdfPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free PDF merge tool</p>
             </div>
           </div>
@@ -115,6 +119,11 @@ export default function MergePdfPage() {
           </nav>
         </header>
 
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>Merge PDF</h2>
@@ -123,6 +132,9 @@ export default function MergePdfPage() {
               document. Files are processed in-memory and are not stored on the
               server.
             </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div className="upload-box">
               <input
@@ -165,22 +177,36 @@ export default function MergePdfPage() {
             ></ins>
             </div>
 
+            <div style={{ marginTop: '1.5rem' }}>
+            <h3>Need more power?</h3>
+            <p style={{ fontSize: '0.9rem', color: '#64748b' }}>
+              Upgrade to <strong>SimbaPDF Pro</strong> to remove ads, process larger
+              files and unlock compress, split and convert tools.
+            </p>
+            <Link href="/pricing" className="primary-btn">
+              View Pro plans
+            </Link>
+          </div>
+
+
           </section>
 
           <section className="seo-text">
             <h3>Free online PDF merger</h3>
             <p>
-              PDFFusion is a free, browser-based PDF merger tool designed for
+              SimbaPDF is a free, browser-based PDF merger tool designed for
               students, businesses, HR departments, legal teams and anyone who
               works with documents. You don&apos;t need to install software or
               create an account. Simply upload your files, press merge, and
               download the combined PDF.
             </p>
+            <AdBanner slot="8164173850" />
+            
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

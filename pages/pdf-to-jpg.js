@@ -2,6 +2,9 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
+import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
 
 export default function PdfToJpgPage() {
   const [file, setFile] = useState(null);
@@ -119,7 +122,7 @@ export default function PdfToJpgPage() {
   return (
     <>
       <Head>
-        <title>PDF to JPG (Single Page) - PDFFusion</title>
+        <title>PDF to JPG (Single Page) - SimbaPDF</title>
         <meta
           name="description"
           content="Export a single page from a PDF as a JPG image directly in your browser."
@@ -135,9 +138,9 @@ export default function PdfToJpgPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -152,6 +155,11 @@ export default function PdfToJpgPage() {
           </nav>
         </header>
 
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>PDF to JPG (Single Page)</h2>
@@ -159,6 +167,9 @@ export default function PdfToJpgPage() {
               Export a single page from your PDF as a JPG image. Choose the page
               number, and this tool will render that page into a high-quality JPG.
             </p>
+
+          {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div className="option-row">
               <label htmlFor="page-number">
@@ -235,14 +246,12 @@ export default function PdfToJpgPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+           <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

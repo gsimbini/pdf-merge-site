@@ -3,6 +3,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
 
 
 export default function RepairPdfPage() {
@@ -91,25 +93,20 @@ export default function RepairPdfPage() {
   return (
     <>
       <Head>
-        <title>Repair PDF - PDFFusion</title>
+        <title>Repair PDF - SimbaPDF</title>
         <meta
           name="description"
-          content="Try to repair a corrupted or problematic PDF by opening and re-saving it in your browser using PDFFusion."
+          content="Try to repair a corrupted or problematic PDF by opening and re-saving it in your browser using SimbaPDF."
         />
-        {/* pdf-lib from CDN */}
-        <script
-          src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        ></script>
+        
       </Head>
 
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -122,6 +119,11 @@ export default function RepairPdfPage() {
           </nav>
         </header>
 
+        <div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>Repair PDF</h2>
@@ -131,6 +133,9 @@ export default function RepairPdfPage() {
               structural issues, errors when opening, and certain &quot;damaged
               file&quot; warnings.
             </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div className="hint" style={{ marginBottom: '0.75rem' }}>
               Note: This browser-based repair cannot fix every corruption. Very
@@ -195,14 +200,12 @@ export default function RepairPdfPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-                          <strong><AdBanner /></strong> Place a banner or AdSense block here.
-                        </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

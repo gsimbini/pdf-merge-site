@@ -1,8 +1,11 @@
 // pages/compress-pdf.js
 import Head from 'next/head';
+import AdBanner from '../components/AdBanner';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
+import ProBadge from "../components/ProBadge";
+
 
 export default function CompressPdfPage() {
   const [file, setFile] = useState(null);
@@ -89,7 +92,7 @@ export default function CompressPdfPage() {
   return (
     <>
       <Head>
-        <title>Compress PDF - PDFFusion</title>
+        <title>Compress PDF - SimbaPDF</title>
         <meta
           name="description"
           content="Compress PDF files online and reduce their size for easier sharing."
@@ -98,9 +101,9 @@ export default function CompressPdfPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -113,6 +116,11 @@ export default function CompressPdfPage() {
           </nav>
         </header>
 
+        <div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>Compress PDF</h2>
@@ -120,6 +128,9 @@ export default function CompressPdfPage() {
               Reduce the size of your PDF so it&apos;s easier to email, upload
               and share. This tool performs safe, in-browser optimization.
             </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+            <AdBanner slot="2169503342" />
 
             <div
               className="upload-box dropzone"
@@ -193,14 +204,12 @@ export default function CompressPdfPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

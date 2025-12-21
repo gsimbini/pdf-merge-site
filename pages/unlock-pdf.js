@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
 
 
 export default function UnlockPdfPage() {
@@ -75,7 +77,7 @@ export default function UnlockPdfPage() {
   return (
     <>
       <Head>
-        <title>Unlock PDF - PDFFusion</title>
+        <title>Unlock PDF - SimbaPDF</title>
         <meta
           name="description"
           content="Try to remove simple restrictions from PDFs you already have access to. Does not crack passwords or strong encryption."
@@ -84,9 +86,9 @@ export default function UnlockPdfPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -99,6 +101,11 @@ export default function UnlockPdfPage() {
           </nav>
         </header>
 
+        <div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>Unlock PDF (basic)</h2>
@@ -107,6 +114,9 @@ export default function UnlockPdfPage() {
               printing limits) from files you already have access to. It does
               <strong> not</strong> crack passwords or break strong encryption.
             </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div className="hint" style={{ marginBottom: '0.75rem' }}>
               Only use this on documents you own or are allowed to modify.
@@ -170,14 +180,12 @@ export default function UnlockPdfPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong><AdBanner /></strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

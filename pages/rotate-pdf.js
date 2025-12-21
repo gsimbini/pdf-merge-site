@@ -3,11 +3,29 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PDFDocument, degrees } from 'pdf-lib';
+import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
+
 
 export default function RotatePdfPage() {
   const [file, setFile] = useState(null);
   const [downloading, setDownloading] = useState(false);
   const [message, setMessage] = useState('');
+  const [rotationMode, setRotationMode] = useState('90cw'); // 90cw | 90ccw | 180
+
+  function getRotationDelta() {
+    switch (rotationMode) {
+      case '90cw':
+        return 90;
+      case '90ccw':
+        return -90;
+      case '180':
+        return 180;
+      default:
+        return 90;
+    }
+  }
 
   async function handleRotate() {
     if (!file) {
@@ -22,11 +40,11 @@ export default function RotatePdfPage() {
       const arrayBuffer = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
       const pages = pdfDoc.getPages();
+      const delta = getRotationDelta();
 
-      // Rotate every page by 90 degrees clockwise
       pages.forEach((page) => {
         const currentRotation = page.getRotation().angle || 0;
-        page.setRotation(degrees(currentRotation + 90));
+        page.setRotation(degrees(currentRotation + delta));
       });
 
       const rotatedBytes = await pdfDoc.save();
@@ -35,7 +53,13 @@ export default function RotatePdfPage() {
 
       const a = document.createElement('a');
       a.href = url;
-      a.download = `rotated-${file.name}`;
+      const suffix =
+        rotationMode === '90cw'
+          ? 'rotated-90cw-'
+          : rotationMode === '90ccw'
+          ? 'rotated-90ccw-'
+          : 'rotated-180-';
+      a.download = `${suffix}${file.name}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -53,18 +77,18 @@ export default function RotatePdfPage() {
   return (
     <>
       <Head>
-        <title>Rotate PDF - PDFFusion</title>
+        <title>Rotate PDF - SimbaPDF</title>
         <meta
           name="description"
-          content="Rotate pages in your PDF document by 90 degrees."
+          content="Rotate pages in your PDF document by 90° or 180°."
         />
       </Head>
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -77,10 +101,36 @@ export default function RotatePdfPage() {
           </nav>
         </header>
 
+        <div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>Rotate PDF</h2>
-            <p>Rotate all pages in your PDF by 90° clockwise.</p>
+            <p>
+              Choose how you want to rotate your PDF, then download the updated
+              file.
+            </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
+
+            <div className="option-row">
+              <label htmlFor="rotation-mode">
+                <strong>Rotation:</strong>
+              </label>
+              <select
+                id="rotation-mode"
+                value={rotationMode}
+                onChange={(e) => setRotationMode(e.target.value)}
+              >
+                <option value="90cw">90° clockwise</option>
+                <option value="90ccw">90° counter-clockwise</option>
+                <option value="180">180° (upside down)</option>
+              </select>
+            </div>
 
             <div
               className="upload-box dropzone"
@@ -136,14 +186,12 @@ export default function RotatePdfPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong>Ad slot:</strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

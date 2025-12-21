@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { PDFDocument } from 'pdf-lib';
 import AdBanner from '../components/AdBanner';
+import ProBadge from "../components/ProBadge";
+
 
 
 export default function PngToPdfPage() {
@@ -110,7 +112,7 @@ export default function PngToPdfPage() {
   return (
     <>
       <Head>
-        <title>PNG to PDF - PDFFusion</title>
+        <title>PNG to PDF - SimbaPDF</title>
         <meta
           name="description"
           content="Convert one or multiple PNG images to a single multi-page PDF document."
@@ -119,9 +121,9 @@ export default function PngToPdfPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">PF</span>
+            <span className="logo-circle">SPDF</span>
             <div>
-              <h1>PDFFusion</h1>
+              <h1>SimbaPDF</h1>
               <p className="tagline">Free &amp; private online PDF tools</p>
             </div>
           </div>
@@ -134,6 +136,11 @@ export default function PngToPdfPage() {
           </nav>
         </header>
 
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
+
         <main className="main">
           <section className="tool-section">
             <h2>PNG to PDF</h2>
@@ -141,6 +148,9 @@ export default function PngToPdfPage() {
               Turn one or more PNG images into a single PDF. Each PNG becomes its
               own page, centered and scaled to fit.
             </p>
+
+            {/* 🔹 Inline tools ad (top/middle of page) */}
+  <AdBanner slot="2169503342" />
 
             <div
               className="upload-box dropzone"
@@ -192,14 +202,12 @@ export default function PngToPdfPage() {
               </p>
             )}
 
-            <div className="ad-slot">
-              <strong><AdBanner /></strong> Place a banner or AdSense block here.
-            </div>
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 
         <footer className="footer">
-          <p>© {new Date().getFullYear()} PDFFusion. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
     </>

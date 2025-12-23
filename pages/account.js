@@ -64,7 +64,7 @@ export default function AccountPage() {
         <div className="page">
           <header className="header">
             <div className="brand">
-              <span className="logo-circle">SP</span>
+              <span className="logo-circle">SPDF</span>
               <div>
                 <h1>SimbaPDF</h1>
                 <p className="tagline">Account</p>

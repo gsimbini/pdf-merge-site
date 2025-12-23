@@ -1,4 +1,7 @@
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 // pages/crop-pdf.js
+
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';

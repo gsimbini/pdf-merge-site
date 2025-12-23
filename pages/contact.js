@@ -47,8 +47,8 @@ export default function ContactPage() {
             <div className="upload-box" style={{ padding: '2rem', textAlign: 'center' }}>
               <h3 style={{ marginBottom: '1rem' }}>Email Us</h3>
               <p style={{ fontSize: '1.2rem', marginBottom: '1.5rem' }}>
-                <a href="mailto:hello@simbapdf.com" style={{ color: '#0070f3', textDecoration: 'none' }}>
-                  hello@simbapdf.com
+                <a href="mailto:givensimbini@gmail.com" style={{ color: '#0070f3', textDecoration: 'none' }}>
+                  givensimbini@gmail.com
                 </a>
               </p>
               <p className="hint">

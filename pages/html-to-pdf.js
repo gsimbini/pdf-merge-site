@@ -1,7 +1,6 @@
-'use client';  // ← ADD THIS AT THE VERY TOP
+'use client';
 
 // pages/html-to-pdf.js
-
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useRef } from 'react';

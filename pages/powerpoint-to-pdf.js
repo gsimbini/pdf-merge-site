@@ -1,18 +1,18 @@
-'use client';  // ← ADD THIS AT THE VERY TOP
+'use client';
 
 // pages/powerpoint-to-pdf.js
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
 import AdBanner from '../components/AdBanner';
-import ProBadge from "../components/ProBadge";
-
+import ProBadge from '../components/ProBadge';
 
 export default function PowerPointToPdfPage() {
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState([]); // Array of image files (slides)
   const [processing, setProcessing] = useState(false);
   const [message, setMessage] = useState('');
 
+  // Format file size
   function formatBytes(bytes) {
     if (bytes === 0) return '0 B';
     const k = 1024;
@@ -21,34 +21,30 @@ export default function PowerPointToPdfPage() {
     return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
   }
 
+  // Handle selected or dropped files
   function handleFiles(selectedList) {
-    if (!selectedList || !selectedList.length) return;
+    if (!selectedList || selectedList.length === 0) return;
 
     const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const valid = Array.from(selectedList).filter((f) => allowed.includes(f.type));
 
-    const valid = Array.from(selectedList).filter((f) => {
-      if (!allowed.includes(f.type)) return false;
-      return true;
-    });
-
-    if (!valid.length) {
+    if (valid.length === 0) {
       setMessage(
-        'Please select slide images (JPG, PNG or WEBP). Export your PowerPoint slides as images first.'
+        'No valid slide images found. Please select JPG, PNG or WEBP files (export your PowerPoint slides as images first).'
       );
+      setFiles([]);
       return;
     }
 
     setFiles(valid);
     const totalSize = valid.reduce((sum, f) => sum + f.size, 0);
     setMessage(
-      `Selected ${valid.length} slide image(s), total ${formatBytes(
-        totalSize
-      )}. They will be used in this order.`
+      `Selected ${valid.length} slide image(s) — total ${formatBytes(totalSize)}. They will be used in this order.`
     );
   }
 
   async function handleConvert() {
-    if (!files.length) {
+    if (files.length === 0) {
       setMessage('Please select slide images first.');
       return;
     }
@@ -60,9 +56,7 @@ export default function PowerPointToPdfPage() {
 
     const PDFLib = window.PDFLib;
     if (!PDFLib) {
-      setMessage(
-        'PDF engine is still loading. Please wait a moment and try again.'
-      );
+      setMessage('PDF engine is still loading. Please wait a moment and try again.');
       return;
     }
 
@@ -84,10 +78,10 @@ export default function PowerPointToPdfPage() {
           img = await pdfDoc.embedJpg(bytes);
         }
 
-        // Get image size and make the page match it
-        const { width, height } = img.size();
+        const { width, height } = img.scale(1); // Get original dimensions
 
         const page = pdfDoc.addPage([width, height]);
+
         page.drawImage(img, {
           x: 0,
           y: 0,
@@ -99,9 +93,10 @@ export default function PowerPointToPdfPage() {
       const pdfBytes = await pdfDoc.save();
 
       const baseName =
-        files[0]?.name.replace(/\.[^.]+$/, '') || 'powerpoint-slides';
+        files[0]?.name.replace(/\.[^/.]+$/, '') || 'powerpoint-slides';
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
+
       const a = document.createElement('a');
       a.href = url;
       a.download = `${baseName}-slides.pdf`;
@@ -111,13 +106,13 @@ export default function PowerPointToPdfPage() {
       URL.revokeObjectURL(url);
 
       setMessage(
-        `Done! Created a PDF with ${files.length} slide page(s). It should be downloading now.`
+        `Done! Created a PDF with ${files.length} slide page(s). Download should start now.`
       );
     } catch (err) {
       console.error(err);
       setMessage(
         err.message ||
-          'Something went wrong while converting the slide images to a PDF.'
+          'Something went wrong while converting the slide images to PDF. Try with fewer or smaller images.'
       );
     } finally {
       setProcessing(false);
@@ -127,12 +122,16 @@ export default function PowerPointToPdfPage() {
   return (
     <>
       <Head>
-        <title>PowerPoint to PDF (images) - SimbaPDF</title>
+        <title>PowerPoint to PDF (slide images) - SimbaPDF</title>
         <meta
           name="description"
-          content="Turn exported PowerPoint slide images into a PDF, directly in your browser."
+          content="Export your PowerPoint slides as images and convert them to a clean PDF — all in your browser."
         />
-      
+        {/* PDFLib CDN — needed for client-side PDF creation */}
+        <script
+          src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"
+          crossOrigin="anonymous"
+        ></script>
       </Head>
 
       <div className="page">
@@ -151,113 +150,98 @@ export default function PowerPointToPdfPage() {
           </nav>
         </header>
 
-        <div style={{ marginTop: "0.75rem" }}>
-  <ProBadge />
-</div>
-
+        <div style={{ marginTop: '0.75rem' }}>
+          <ProBadge />
+        </div>
 
         {/* Main */}
         <main className="main">
           <section className="tool-section">
             <h2>PowerPoint to PDF (slide images)</h2>
             <p>
-              Export your PowerPoint slides as images (JPG/PNG), upload them in
-              order, and get a clean PDF where each slide becomes a full-page
-              image. Everything happens in your browser for better privacy.
+              Export your PowerPoint slides as images (JPG/PNG/WEBP), upload them in order, and get a clean PDF with one slide per page.
             </p>
 
             <div className="hint" style={{ marginBottom: '0.75rem' }}>
               <strong>How to use:</strong>
               <ol style={{ marginTop: '0.4rem', paddingLeft: '1.2rem' }}>
-                <li>
-                  In PowerPoint, use <em>File &gt; Export &gt; Change File
-                  Type</em> or <em>Save As</em> and choose <strong>PNG</strong>{' '}
-                  or <strong>JPG</strong>.
-                </li>
-                <li>Export all slides — they will be numbered (Slide1, 2, 3…).</li>
-                <li>Drag those images here in the correct order.</li>
-                <li>Click convert, and download your PDF.</li>
+                <li>In PowerPoint → File → Export → Change File Type → PNG or JPG.</li>
+                <li>Save all slides (they will be numbered automatically).</li>
+                <li>Drag or select those images here in the correct order.</li>
+                <li>Click convert and download your PDF.</li>
               </ol>
             </div>
 
-            {/* 🔹 Inline tools ad (top/middle of page) */}
-  <AdBanner slot="2169503342" />
+            {/* Top ad */}
+            <AdBanner slot="2169503342" />
 
+            {/* Upload box — now accepts multiple images */}
             <div
-  className="upload-box dropzone"
-  onDragOver={(e) => e.preventDefault()}
-  onDrop={(e) => {
-    e.preventDefault();
-    const f = e.dataTransfer.files?.[0];
-    if (f && f.name.endsWith('.pptx')) {
-      setFile(f);
-      setMessage(`Selected: ${f.name}`);
-    } else if (f) {
-      setMessage('Please upload a valid .pptx file.');
-    }
-  }}
-  onClick={() => document.getElementById('ppt-file-input')?.click()}
->
-  <p>
-    <strong>Drag & drop</strong> your PowerPoint file here
-    <br />
-    <span style={{ fontSize: '0.9em', color: '#666' }}>or click to browse</span>
-  </p>
+              className="upload-box dropzone"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                handleFiles(e.dataTransfer.files);
+              }}
+              onClick={() => document.getElementById('ppt-images-input')?.click()}
+            >
+              <p>
+                <strong>Drag & drop</strong> your slide images here (multiple allowed)
+                <br />
+                <span style={{ fontSize: '0.9em', color: '#666' }}>
+                  or click to browse (JPG, PNG, WEBP)
+                </span>
+              </p>
 
-  <input
-    id="ppt-file-input"
-    type="file"
-    accept=".pptx"
-    style={{ display: 'none' }}
-    onChange={(e) => {
-      const f = e.target.files?.[0];
-      if (f) setFile(f);
-    }}
-  />
-</div>
+              <input
+                id="ppt-images-input"
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                multiple
+                style={{ display: 'none' }}
+                onChange={(e) => handleFiles(e.target.files)}
+              />
+            </div>
 
-<div style={{ marginTop: '1.5rem' }}>
-  <button
-    type="button"
-    className="secondary-btn"
-    onClick={() => document.getElementById('ppt-file-input')?.click()}
-    style={{
-      padding: '0.75rem 1.5rem',
-      fontSize: '1rem',
-      backgroundColor: '#f0f0f0',
-      border: '2px dashed #ccc',
-      borderRadius: '8px',
-      cursor: 'pointer',
-    }}
-  >
-    📊 Choose PowerPoint File
-  </button>
-</div>
+            <div style={{ marginTop: '1.5rem' }}>
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() => document.getElementById('ppt-images-input')?.click()}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  fontSize: '1rem',
+                  backgroundColor: '#f0f0f0',
+                  border: '2px dashed #ccc',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                }}
+              >
+                🖼️ Choose Slide Images
+              </button>
+            </div>
 
-{file && (
-  <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
-    <strong>Selected:</strong> {file.name} ({formatBytes(file.size)})
-  </div>
-)}
+            {files.length > 0 && (
+              <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
+                <strong>Selected:</strong> {files.length} slide image(s)
+              </div>
+            )}
 
             <button
               className="primary-btn"
               onClick={handleConvert}
-              disabled={!files.length || processing}
+              disabled={files.length === 0 || processing}
               style={{ marginTop: '1rem' }}
             >
-              {processing
-                ? 'Converting slides to PDF…'
-                : 'Convert slides to PDF and download'}
+              {processing ? 'Converting slides to PDF…' : 'Convert to PDF and download'}
             </button>
 
             {message && (
-              <p className="hint" style={{ marginTop: '0.75rem' }}>
-                {message}
-              </p>
+              <p className="hint" style={{ marginTop: '0.75rem' }}>{message}</p>
             )}
 
-           <AdBanner slot="8164173850" />
+            {/* Bottom ad */}
+            <AdBanner slot="8164173850" />
           </section>
         </main>
 

@@ -164,40 +164,65 @@ export default function JpgToPdfPage() {
   <AdBanner slot="2169503342" />
 
             <div
-              className="upload-box dropzone"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const fileList = e.dataTransfer.files;
-                handleFilesSelected(fileList);
-              }}
-              onClick={() =>
-                document.getElementById('jpg-to-pdf-input')?.click()
-              }
-            >
-              <p>
-                <strong>Drag &amp; drop</strong> JPG/PNG images here, or click to
-                choose.
-              </p>
-              <input
-                id="jpg-to-pdf-input"
-                type="file"
-                accept="image/jpeg,image/jpg,image/png"
-                multiple
-                style={{ display: 'none' }}
-                onChange={(e) => handleFilesSelected(e.target.files)}
-              />
-              {files.length > 0 && (
-                <ul className="file-list">
-                  {files.map((f, idx) => (
-                    <li key={idx}>
-                      {f.name} ({formatBytes(f.size)})
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+  className="upload-box dropzone"
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={(e) => {
+    e.preventDefault();
+    const newFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (newFiles.length > 0) {
+      setFiles(prev => [...prev, ...newFiles]);
+      setMessage(`Added ${newFiles.length} image(s)`);
+    } else {
+      setMessage('Please upload valid image files.');
+    }
+  }}
+  onClick={() => document.getElementById('jpg-file-input')?.click()}
+>
+  <p>
+    <strong>Drag & drop</strong> images here (multiple allowed)
+    <br />
+    <span style={{ fontSize: '0.9em', color: '#666' }}>or click to browse</span>
+  </p>
 
+  <input
+    id="jpg-file-input"
+    type="file"
+    accept="image/*"
+    multiple
+    style={{ display: 'none' }}
+    onChange={(e) => {
+      const newFiles = Array.from(e.target.files || []);
+      if (newFiles.length > 0) {
+        setFiles(prev => [...prev, ...newFiles]);
+        setMessage(`Added ${newFiles.length} image(s)`);
+      }
+    }}
+  />
+</div>
+
+<div style={{ marginTop: '1.5rem' }}>
+  <button
+    type="button"
+    className="secondary-btn"
+    onClick={() => document.getElementById('jpg-file-input')?.click()}
+    style={{
+      padding: '0.75rem 1.5rem',
+      fontSize: '1rem',
+      backgroundColor: '#f0f0f0',
+      border: '2px dashed #ccc',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    }}
+  >
+    🖼️ Choose Images
+  </button>
+</div>
+
+{files && files.length > 0 && (
+  <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
+    <strong>Selected:</strong> {files.length} image(s)
+  </div>
+)}
             <button
               className="primary-btn"
               onClick={handleConvert}

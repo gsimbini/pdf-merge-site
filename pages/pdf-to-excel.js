@@ -177,9 +177,6 @@ export default function PdfToExcelPage() {
           </div>
           <nav className="nav">
             <Link href="/">Home</Link>
-            <Link href="/merge-pdf">Merge PDF</Link>
-            <Link href="/pdf-to-word">PDF to Word</Link>
-            <Link href="/pdf-to-excel">PDF to Excel</Link>
             <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
@@ -207,45 +204,61 @@ export default function PdfToExcelPage() {
   <AdBanner slot="2169503342" />
 
             <div
-              className="upload-box dropzone"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const f = e.dataTransfer.files?.[0];
-                if (f) {
-                  setFile(f);
-                  setMessage(`Selected: ${f.name} (${formatBytes(f.size)})`);
-                }
-              }}
-              onClick={() =>
-                document.getElementById('pdf-to-excel-input')?.click()
-              }
-            >
-              <p>
-                <strong>Drag &amp; drop</strong> your PDF here, or click to
-                choose.
-              </p>
-              <input
-                id="pdf-to-excel-input"
-                type="file"
-                accept="application/pdf"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) {
-                    setFile(f);
-                    setMessage(
-                      `Selected: ${f.name} (${formatBytes(f.size)})`
-                    );
-                  }
-                }}
-              />
-              {file && (
-                <ul className="file-list">
-                  <li>{file.name}</li>
-                </ul>
-              )}
-            </div>
+  className="upload-box dropzone"
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={(e) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files?.[0];
+    if (f && f.type === 'application/pdf') {
+      setFile(f);
+      setMessage(`Selected: ${f.name}`);
+    } else if (f) {
+      setMessage('Please upload a valid PDF file.');
+    }
+  }}
+  onClick={() => document.getElementById('excel-file-input')?.click()}
+>
+  <p>
+    <strong>Drag & drop</strong> your PDF here
+    <br />
+    <span style={{ fontSize: '0.9em', color: '#666' }}>or click to browse</span>
+  </p>
+
+  <input
+    id="excel-file-input"
+    type="file"
+    accept="application/pdf"
+    style={{ display: 'none' }}
+    onChange={(e) => {
+      const f = e.target.files?.[0];
+      if (f) setFile(f);
+    }}
+  />
+</div>
+
+<div style={{ marginTop: '1.5rem' }}>
+  <button
+    type="button"
+    className="secondary-btn"
+    onClick={() => document.getElementById('excel-file-input')?.click()}
+    style={{
+      padding: '0.75rem 1.5rem',
+      fontSize: '1rem',
+      backgroundColor: '#f0f0f0',
+      border: '2px dashed #ccc',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    }}
+  >
+    📄 Choose PDF File
+  </button>
+</div>
+
+{file && (
+  <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
+    <strong>Selected:</strong> {file.name} ({formatBytes(file.size)})
+  </div>
+)}
 
             <button
               className="primary-btn"

@@ -186,26 +186,64 @@ export default function HtmlToPdfPage() {
             </div>
 
             <div
-              className="upload-box"
-              style={{
-                marginTop: '1rem',
-                backgroundColor: '#ffffff',
-                borderStyle: 'dashed',
-              }}
-            >
-              <strong>Preview:</strong>
-              <div
-                ref={previewRef}
-                style={{
-                  marginTop: '0.75rem',
-                  padding: '1rem',
-                  borderRadius: '0.5rem',
-                  border: '1px solid #e5e7eb',
-                  background: '#ffffff',
-                }}
-                dangerouslySetInnerHTML={{ __html: htmlInput }}
-              />
-            </div>
+  className="upload-box dropzone"
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={(e) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files?.[0];
+    if (f && (f.name.endsWith('.html') || f.name.endsWith('.htm'))) {
+      setFile(f);
+      setMessage(`Selected: ${f.name}`);
+    } else if (f) {
+      setMessage('Please upload a valid HTML file.');
+    }
+  }}
+  onClick={() => document.getElementById('html-file-input')?.click()}
+>
+  <p>
+    <strong>Drag & drop</strong> your HTML file here
+    <br />
+    <span style={{ fontSize: '0.9em', color: '#666' }}>or click to browse</span>
+  </p>
+
+  <input
+    id="html-file-input"
+    type="file"
+    accept=".html,.htm"
+    style={{ display: 'none' }}
+    onChange={(e) => {
+      const f = e.target.files?.[0];
+      if (f) {
+        setFile(f);
+        setMessage(`Selected: ${f.name}`);
+      }
+    }}
+  />
+</div>
+
+<div style={{ marginTop: '1.5rem' }}>
+  <button
+    type="button"
+    className="secondary-btn"
+    onClick={() => document.getElementById('html-file-input')?.click()}
+    style={{
+      padding: '0.75rem 1.5rem',
+      fontSize: '1rem',
+      backgroundColor: '#f0f0f0',
+      border: '2px dashed #ccc',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    }}
+  >
+    🌐 Choose HTML File
+  </button>
+</div>
+
+{file && (
+  <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
+    <strong>Selected:</strong> {file.name} ({formatBytes(file.size)})
+  </div>
+)}
 
             <button
               className="primary-btn"

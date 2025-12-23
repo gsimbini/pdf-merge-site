@@ -1,6 +1,8 @@
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 // components/useProStatus.js
 import { useEffect, useState } from "react";
-import { getSupabase } from "../lib/supabaseClient";
+import { getSupabase } from "../../lib/supabaseClient";
 
 export default function useProStatus() {
   // Start with null to indicate "unknown" during SSR

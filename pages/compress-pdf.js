@@ -1,4 +1,7 @@
 // pages/compress-pdf.js
+
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 import Head from 'next/head';
 import AdBanner from '../components/AdBanner';
 import Link from 'next/link';

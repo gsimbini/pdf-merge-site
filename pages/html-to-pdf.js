@@ -1,4 +1,6 @@
 // pages/html-to-pdf.js
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useRef } from 'react';

@@ -1,6 +1,8 @@
+'use client';
+
 // pages/login.js
-import Head from "next/head";
-import Link from "next/link";
+import Head from 'next/head';
+import Link from 'next/link';
 import { useEffect, useState } from "react";
 import { getSupabase } from "../lib/supabaseClient";
 import ProBadge from "../components/ProBadge";
@@ -12,12 +14,14 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  // Pre-fill email from localStorage if available
   useEffect(() => {
     if (typeof window === "undefined") return;
     const saved = localStorage.getItem("simbapdf_email") || "";
     if (saved) setEmail(saved);
   }, []);
 
+  // Google Sign-In
   async function signInWithGoogle() {
     setError("");
     setBusy(true);
@@ -25,7 +29,7 @@ export default function LoginPage() {
     try {
       const supabase = getSupabase();
       if (!supabase) {
-        setError("Login is temporarily unavailable (Supabase not configured).");
+        setError("Login service is temporarily unavailable.");
         setBusy(false);
         return;
       }
@@ -37,18 +41,21 @@ export default function LoginPage() {
         },
       });
 
-      if (error) setError(error.message);
+      if (error) throw error;
+      // Redirect happens automatically
     } catch (e) {
-      setError(e?.message || "Google sign-in failed.");
+      setError(e?.message || "Google sign-in failed. Please try again.");
       setBusy(false);
     }
   }
 
+  // Magic Link Sign-In
   async function sendMagicLink() {
     setError("");
+    setSent(false);
 
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      setError("Please enter a valid email.");
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -57,26 +64,24 @@ export default function LoginPage() {
     try {
       const supabase = getSupabase();
       if (!supabase) {
-        setError("Login is temporarily unavailable (Supabase not configured).");
+        setError("Login service is temporarily unavailable.");
         setBusy(false);
         return;
       }
 
       const { error } = await supabase.auth.signInWithOtp({
-        email,
+        email: email.trim().toLowerCase(),
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
-      if (error) {
-        setError(error.message);
-      } else {
-        setSent(true);
-        localStorage.setItem("simbapdf_email", email.trim().toLowerCase());
-      }
+      if (error) throw error;
+
+      setSent(true);
+      localStorage.setItem("simbapdf_email", email.trim().toLowerCase());
     } catch (e) {
-      setError(e?.message || "Failed to send magic link.");
+      setError(e?.message || "Failed to send magic link. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -86,7 +91,7 @@ export default function LoginPage() {
     <>
       <Head>
         <title>Login - SimbaPDF</title>
-        <meta name="description" content="Login to SimbaPDF using email or Google." />
+        <meta name="description" content="Login to SimbaPDF using Google or email magic link." />
       </Head>
 
       <div className="page">
@@ -112,18 +117,18 @@ export default function LoginPage() {
 
         <main className="main">
           <section className="tool-section">
-            <h2>Sign in</h2>
+            <h2>Sign in to SimbaPDF</h2>
             <p className="hint">
-              Sign in to manage your subscription and unlock Pro benefits across devices.
+              Unlock Pro features across devices, manage your subscription, and remove ads.
             </p>
 
             <AdBanner slot="2169503342" />
 
-            {/* Google signup/login */}
-            <div className="upload-box" style={{ marginTop: "1rem" }}>
+            {/* Google Sign-In */}
+            <div className="upload-box" style={{ marginTop: "1.5rem", textAlign: "center" }}>
               <strong>Continue with Google</strong>
               <p className="hint" style={{ marginTop: "0.35rem" }}>
-                Use your Gmail / Google account to sign in.
+                Fast and secure — use your Google account to sign in.
               </p>
 
               <button
@@ -131,17 +136,23 @@ export default function LoginPage() {
                 className="primary-btn"
                 onClick={signInWithGoogle}
                 disabled={busy}
-                style={{ marginTop: "0.75rem" }}
+                style={{ marginTop: "0.75rem", padding: "0.75rem 2rem" }}
               >
-                {busy ? "Please wait…" : "Continue with Google"}
+                {busy ? "Please wait…" : "Sign in with Google"}
               </button>
             </div>
 
-            {/* Email magic link */}
+            {/* Divider */}
+            <div style={{ textAlign: "center", margin: "2rem 0", color: "#666" }}>
+              <span style={{ background: "#fff", padding: "0 1rem" }}>or</span>
+              <hr style={{ margin: "0.5rem 0", border: "none", borderTop: "1px solid #ddd" }} />
+            </div>
+
+            {/* Email Magic Link */}
             <div className="upload-box" style={{ marginTop: "1rem" }}>
-              <strong>Or sign in with email</strong>
+              <strong>Sign in with Email</strong>
               <p className="hint" style={{ marginTop: "0.35rem" }}>
-                We’ll send you a secure magic link.
+                We'll send you a secure magic link — no password needed.
               </p>
 
               <input
@@ -149,30 +160,33 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="text-input"
                 style={{ width: "100%", marginTop: "0.75rem" }}
+                disabled={busy}
               />
 
               <button
                 type="button"
                 className="primary-btn"
                 onClick={sendMagicLink}
-                disabled={busy}
-                style={{ marginTop: "0.75rem" }}
+                disabled={busy || !email}
+                style={{ marginTop: "0.75rem", width: "100%" }}
               >
                 {busy ? "Sending…" : "Send Magic Link"}
               </button>
 
               {sent && (
-                <p className="hint" style={{ marginTop: "0.75rem" }}>
-                  ✅ Link sent — check your inbox (and spam folder).
+                <p className="hint" style={{ marginTop: "0.75rem", color: "#28a745" }}>
+                  ✅ Magic link sent! Check your inbox (and spam folder).
                 </p>
               )}
             </div>
 
+            {/* Error Display */}
             {error && (
-              <div className="upload-box" style={{ marginTop: "1rem" }}>
-                <strong style={{ color: "#ff6b6b" }}>Login error</strong>
-                <p className="hint" style={{ marginTop: "0.35rem" }}>
+              <div className="upload-box" style={{ marginTop: "1.5rem", background: "#fff0f0" }}>
+                <strong style={{ color: "#d63031" }}>Error</strong>
+                <p className="hint" style={{ marginTop: "0.35rem", color: "#d63031" }}>
                   {error}
                 </p>
               </div>

@@ -12,7 +12,6 @@ export default function HomePage() {
 
   const q = search.trim().toLowerCase();
 
-  // Fetch daily motivational quote
   useEffect(() => {
     fetch('https://zenquotes.io/api/random')
       .then(res => res.json())
@@ -32,169 +31,49 @@ export default function HomePage() {
   }, []);
 
   const popularTools = [
-    {
-      href: '/merge-pdf',
-      title: 'Merge PDF',
-      description: 'Combine multiple PDFs into a single document.',
-    },
-    {
-      href: '/pdf-to-pdfa',
-      title: 'PDF to PDF/A (basic)',
-      description:
-        'Create a simple archival-style copy of a PDF (browser-only, not strict validator-grade).',
-    },
-    {
-      href: '/split-pdf',
-      title: 'Split PDF',
-      description: 'Extract selected pages or ranges into a new PDF.',
-    },
-    {
-      href: '/pdf-to-powerpoint',
-      title: 'PDF to PowerPoint (text slides)',
-      description:
-        'Make a simple PowerPoint where each PDF page becomes a slide with text bullets.',
-    },
-    {
-      href: '/powerpoint-to-pdf',
-      title: 'PowerPoint to PDF (images)',
-      description:
-        'Export slides as images (JPG/PNG) and turn them into a PDF, one slide per page.',
-    },
-    {
-      href: '/compress-pdf',
-      title: 'Compress PDF',
-      description: 'Reduce file size while keeping readable quality.',
-    },
-    {
-      href: '/rotate-pdf',
-      title: 'Rotate PDF',
-      description: 'Fix sideways or upside-down pages instantly.',
-    },
+    { href: '/merge-pdf', title: 'Merge PDF', description: 'Combine multiple PDFs into a single document.' },
+    { href: '/pdf-to-pdfa', title: 'PDF to PDF/A (basic)', description: 'Create a simple archival-style copy of a PDF (browser-only, not strict validator-grade).' },
+    { href: '/split-pdf', title: 'Split PDF', description: 'Extract selected pages or ranges into a new PDF.' },
+    { href: '/pdf-to-powerpoint', title: 'PDF to PowerPoint (text slides)', description: 'Make a simple PowerPoint where each PDF page becomes a slide with text bullets.' },
+    { href: '/powerpoint-to-pdf', title: 'PowerPoint to PDF (images)', description: 'Export slides as images (JPG/PNG) and turn them into a PDF, one slide per page.' },
+    { href: '/compress-pdf', title: 'Compress PDF', description: 'Reduce file size while keeping readable quality.' },
+    { href: '/rotate-pdf', title: 'Rotate PDF', description: 'Fix sideways or upside-down pages instantly.' },
   ];
 
   const editTools = [
-    {
-      href: '/organize-pdf',
-      title: 'Organise PDF',
-      description: 'Reorder, duplicate or remove pages by choosing an order.',
-    },
-    {
-      href: '/crop-pdf',
-      title: 'Crop PDF',
-      description: 'Trim margins and crop all pages at once.',
-    },
-    {
-      href: '/page-numbers',
-      title: 'Add page numbers',
-      description: 'Add page numbers to all or some pages.',
-    },
-    {
-      href: '/watermark-pdf',
-      title: 'Watermark PDF',
-      description: 'Add CONFIDENTIAL, DRAFT or custom text watermarks.',
-    },
-    {
-      href: '/sign-pdf',
-      title: 'Sign PDF',
-      description: 'Add a typed signature and date to your document.',
-    },
-    {
-      href: '/repair-pdf',
-      title: 'Repair PDF',
-      description:
-        'Try to fix a damaged PDF by opening and re-saving it as a fresh file.',
-    },
+    { href: '/organize-pdf', title: 'Organise PDF', description: 'Reorder, duplicate or remove pages by choosing an order.' },
+    { href: '/crop-pdf', title: 'Crop PDF', description: 'Trim margins and crop all pages at once.' },
+    { href: '/page-numbers', title: 'Add page numbers', description: 'Add page numbers to all or some pages.' },
+    { href: '/watermark-pdf', title: 'Watermark PDF', description: 'Add CONFIDENTIAL, DRAFT or custom text watermarks.' },
+    { href: '/sign-pdf', title: 'Sign PDF', description: 'Add a typed signature and date to your document.' },
+    { href: '/repair-pdf', title: 'Repair PDF', description: 'Try to fix a damaged PDF by opening and re-saving it as a fresh file.' },
   ];
 
   const securityTools = [
-    {
-      href: '/protect-pdf',
-      title: 'Protect PDF (soft)',
-      description:
-        'Add visible protection labels, owner information and watermarks.',
-    },
-    {
-      href: '/unlock-pdf',
-      title: 'Unlock PDF',
-      description:
-        'Re-save PDFs you already have access to. Does not crack passwords.',
-    },
+    { href: '/protect-pdf', title: 'Protect PDF (soft)', description: 'Add visible protection labels, owner information and watermarks.' },
+    { href: '/unlock-pdf', title: 'Unlock PDF', description: 'Re-save PDFs you already have access to. Does not crack passwords.' },
   ];
 
   const imageTools = [
-    {
-      href: '/jpg-to-pdf',
-      title: 'JPG to PDF',
-      description: 'Turn one or more JPG images into a single PDF.',
-    },
-    {
-      href: '/png-to-pdf',
-      title: 'PNG to PDF',
-      description: 'Convert PNG images into a multi-page PDF.',
-    },
-    {
-      href: '/pdf-to-png',
-      title: 'PDF to PNG (page)',
-      description: 'Export a single PDF page as a PNG image.',
-    },
-    {
-      href: '/pdf-to-jpg',
-      title: 'PDF to JPG (page)',
-      description: 'Export a single PDF page as a JPG image.',
-    },
-    {
-      href: '/pdf-to-images',
-      title: 'PDF to images (ZIP)',
-      description: 'Convert all pages to JPG images and download as a ZIP.',
-    },
+    { href: '/jpg-to-pdf', title: 'JPG to PDF', description: 'Turn one or more JPG images into a single PDF.' },
+    { href: '/png-to-pdf', title: 'PNG to PDF', description: 'Convert PNG images into a multi-page PDF.' },
+    { href: '/pdf-to-png', title: 'PDF to PNG (page)', description: 'Export a single PDF page as a PNG image.' },
+    { href: '/pdf-to-jpg', title: 'PDF to JPG (page)', description: 'Export a single PDF page as a JPG image.' },
+    { href: '/pdf-to-images', title: 'PDF to images (ZIP)', description: 'Convert all pages to JPG images and download as a ZIP.' },
   ];
 
   const textOfficeTools = [
-    {
-      href: '/extract-text',
-      title: 'Extract text from PDF',
-      description: 'Pull out plain text and download it as a .txt file.',
-    },
-    {
-      href: '/pdf-to-word',
-      title: 'PDF to Word (text)',
-      description: 'Convert PDF into a simple text-only Word document.',
-    },
-    {
-      href: '/word-to-pdf',
-      title: 'Word to PDF (text)',
-      description: 'Turn a .docx or .txt file into a text-based PDF.',
-    },
-    {
-      href: '/pdf-to-excel',
-      title: 'PDF to Excel (text)',
-      description: 'Export PDF text lines into Excel rows with page numbers.',
-    },
-    {
-      href: '/excel-to-pdf',
-      title: 'Excel to PDF (text)',
-      description: 'Turn an Excel or CSV file into a text-based PDF.',
-    },
-    {
-      href: '/ocr-to-pdf',
-      title: 'OCR to PDF (searchable)',
-      description: 'Run OCR on a scanned PDF and create a searchable PDF.',
-    },
-    {
-      href: '/html-to-pdf',
-      title: 'HTML to PDF',
-      description: 'Paste simple HTML, preview it and download as a PDF.',
-    },
+    { href: '/extract-text', title: 'Extract text from PDF', description: 'Pull out plain text and download it as a .txt file.' },
+    { href: '/pdf-to-word', title: 'PDF to Word (text)', description: 'Convert PDF into a simple text-only Word document.' },
+    { href: '/word-to-pdf', title: 'Word to PDF (text)', description: 'Turn a .docx or .txt file into a text-based PDF.' },
+    { href: '/pdf-to-excel', title: 'PDF to Excel (text)', description: 'Export PDF text lines into Excel rows with page numbers.' },
+    { href: '/excel-to-pdf', title: 'Excel to PDF (text)', description: 'Turn an Excel or CSV file into a text-based PDF.' },
+    { href: '/ocr-to-pdf', title: 'OCR to PDF (searchable)', description: 'Run OCR on a scanned PDF and create a searchable PDF.' },
+    { href: '/html-to-pdf', title: 'HTML to PDF', description: 'Paste simple HTML, preview it and download as a PDF.' },
   ];
 
   const filterTools = (tools) =>
-    !q
-      ? tools
-      : tools.filter(
-          (t) =>
-            t.title.toLowerCase().includes(q) ||
-            t.description.toLowerCase().includes(q)
-        );
+    !q ? tools : tools.filter(t => t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
 
   const filteredPopular = filterTools(popularTools);
   const filteredEdit = filterTools(editTools);
@@ -209,17 +88,8 @@ export default function HomePage() {
     filteredImages.length ||
     filteredTextOffice.length;
 
-  const cardStyle = {
-    position: 'relative',
-    overflow: 'visible',
-    minHeight: '130px',
-  };
-
-  const descStyle = {
-    position: 'relative',
-    zIndex: 2,
-    marginTop: '0.4rem',
-  };
+  const cardStyle = { position: 'relative', overflow: 'visible', minHeight: '130px' };
+  const descStyle = { position: 'relative', zIndex: 2, marginTop: '0.4rem' };
 
   return (
     <>
@@ -281,28 +151,31 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* TradingView Ticker Bar */}
+          {/* TradingView Ticker Bar - Fixed */}
           <section className="tool-section" style={{ padding: '0', margin: '2rem 0' }}>
-            <div 
+            <div
               dangerouslySetInnerHTML={{
                 __html: `
                   <!-- TradingView Ticker Tape Widget -->
-                  <div class="tradingview-widget-container" style="height:60px; width:100%;">
+                  <div class="tradingview-widget-container" style="height:70px;width:100%;">
                     <div class="tradingview-widget-container__widget" style="height:100%;"></div>
                     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
                     {
                       "symbols": [
-                        { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
-                        { "proName": "FOREXCOM:NSXUSD", "title": "Nasdaq" },
-                        { "proName": "FOREXCOM:DJI", "title": "Dow Jones" },
-                        { "proName": "FX:EURUSD", "title": "EUR/USD" },
-                        { "proName": "FX:GBPUSD", "title": "GBP/USD" },
-                        { "proName": "FX:USDZAR", "title": "USD/ZAR" },
-                        { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
-                        { "proName": "BITSTAMP:ETHUSD", "title": "Ethereum" }
+                        {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"},
+                        {"proName": "FOREXCOM:NSXUSD", "title": "Nasdaq"},
+                        {"proName": "FOREXCOM:DJI", "title": "Dow Jones"},
+                        {"proName": "FX:EURUSD", "title": "EUR/USD"},
+                        {"proName": "FX:GBPUSD", "title": "GBP/USD"},
+                        {"proName": "FX:USDZAR", "title": "USD/ZAR"},
+                        {"proName": "BITSTAMP:BTCUSD", "title": "Bitcoin"},
+                        {"proName": "BITSTAMP:ETHUSD", "title": "Ethereum"},
+                        {"proName": "NASDAQ:AAPL", "title": "Apple"},
+                        {"proName": "NASDAQ:TSLA", "title": "Tesla"},
+                        {"proName": "NASDAQ:GOOGL", "title": "Google"}
                       ],
                       "colorTheme": "dark",
-                      "isTransparent": true,
+                      "isTransparent": false,
                       "showSymbolLogo": true,
                       "locale": "en"
                     }

@@ -1,7 +1,7 @@
 // pages/auth/callback.js
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { getSupabase } from "../lib/supabaseClient";
+import { getSupabase } from "../../lib/supabaseClient";
 
 export default function AuthCallback() {
   const router = useRouter();

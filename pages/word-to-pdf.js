@@ -150,7 +150,7 @@ export default function WordToPdfPage() {
                   {message}
                 </p>
               )}
-            </div>
+          
 
             <div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
               <button className="primary-btn" type="button" onClick={downloadOriginal} disabled={!file}>

@@ -1,9 +1,12 @@
 // components/AdBanner.js
 import { useEffect, useRef } from "react";
-import useProStatus from "./useProStatus";
+// import useProStatus from "./useProStatus";   // ← COMMENTED OUT temporarily
 
 export default function AdBanner({ slot }) {
-  const { isPro } = useProStatus();
+  // TEMPORARY: Force free user mode (ads always show)
+  // Remove or comment out the real hook above and use this:
+  const isPro = false;   // ← FORCES ads to show for testing
+
   const pushedRef = useRef(false);
 
   // No slot → nothing
@@ -11,20 +14,13 @@ export default function AdBanner({ slot }) {
     return null;
   }
 
-  // While pro status is still loading (null = initial state), show a placeholder
-  // to keep layout consistent and prevent hydration mismatch
-  if (isPro === null) {
-    return (
-      <div style={{ width: "100%", margin: "1rem 0", minHeight: "90px" }} />
-    );
-  }
+  // TEMPORARY: Skip the loading placeholder check
+  // We no longer wait for isPro === null
 
-  // Pro user → completely hide ads
-  if (isPro) {
-    return null;
-  }
+  // TEMPORARY: Skip Pro user hide
+  // if (isPro) return null;   // ← COMMENTED OUT so ads show even if Pro
 
-  // Free user → load and show the ad (only on client)
+  // Load the ad on client (only once)
   useEffect(() => {
     if (pushedRef.current) return;
 
@@ -39,7 +35,7 @@ export default function AdBanner({ slot }) {
   const client = "ca-pub-9212010274013202";
 
   return (
-    <div style={{ width: "100%", margin: "1rem 0", minHeight: "90px", textAlign: "center" }}>
+    <div style={{ width: "100%", margin: "1.5rem 0", minHeight: "250px", textAlign: "center" }}>
       <ins
         className="adsbygoogle"
         style={{ display: "block", width: "100%" }}

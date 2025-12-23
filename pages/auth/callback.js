@@ -1,26 +1,28 @@
 // pages/auth/callback.js
 import { useEffect } from "react";
-import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "next/router";
+import { getSupabase } from "../lib/supabaseClient";
 
 export default function AuthCallback() {
   const router = useRouter();
 
   useEffect(() => {
-    async function finishLogin() {
-      const { data, error } = await supabase.auth.getSession();
-
-      if (data?.session?.user?.email) {
-        localStorage.setItem(
-          "simbapdf_email",
-          data.session.user.email.toLowerCase()
-        );
+    async function finish() {
+      const supabase = getSupabase();
+      if (!supabase) {
+        router.replace("/pricing");
+        return;
       }
 
-      router.replace("/");
+      const { data } = await supabase.auth.getSession();
+      const userEmail = data?.session?.user?.email?.toLowerCase() || "";
+
+      if (userEmail) localStorage.setItem("simbapdf_email", userEmail);
+
+      router.replace("/account");
     }
 
-    finishLogin();
+    finish();
   }, [router]);
 
   return (

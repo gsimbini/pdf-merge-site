@@ -1,3 +1,5 @@
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 // pages/extract-text.js
 import Head from 'next/head';
 import Link from 'next/link';

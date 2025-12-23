@@ -1,3 +1,5 @@
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';

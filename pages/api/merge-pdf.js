@@ -1,4 +1,5 @@
 import { PDFDocument } from 'pdf-lib';
+import AdBanner from '../components/AdBanner';
 
 export const config = {
   api: {

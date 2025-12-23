@@ -1,5 +1,6 @@
-// pages/html-to-pdf.js
 'use client';  // ← ADD THIS AT THE VERY TOP
+
+// pages/html-to-pdf.js
 
 import Head from 'next/head';
 import Link from 'next/link';

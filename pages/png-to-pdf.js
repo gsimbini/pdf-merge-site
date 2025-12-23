@@ -1,3 +1,5 @@
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 // pages/png-to-pdf.js
 import Head from 'next/head';
 import Link from 'next/link';
@@ -129,9 +131,6 @@ export default function PngToPdfPage() {
           </div>
           <nav className="nav">
             <Link href="/">Home</Link>
-            <Link href="/merge-pdf">Merge PDF</Link>
-            <Link href="/png-to-pdf">PNG to PDF</Link>
-            <Link href="/jpg-to-pdf">JPG to PDF</Link>
             <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
@@ -153,39 +152,64 @@ export default function PngToPdfPage() {
   <AdBanner slot="2169503342" />
 
             <div
-              className="upload-box dropzone"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const fileList = e.dataTransfer.files;
-                handleFilesSelected(fileList);
-              }}
-              onClick={() =>
-                document.getElementById('png-to-pdf-input')?.click()
-              }
-            >
-              <p>
-                <strong>Drag &amp; drop</strong> PNG images here, or click to
-                choose.
-              </p>
-              <input
-                id="png-to-pdf-input"
-                type="file"
-                accept="image/png"
-                multiple
-                style={{ display: 'none' }}
-                onChange={(e) => handleFilesSelected(e.target.files)}
-              />
-              {files.length > 0 && (
-                <ul className="file-list">
-                  {files.map((f, idx) => (
-                    <li key={idx}>
-                      {f.name} ({formatBytes(f.size)})
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+  className="upload-box dropzone"
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={(e) => {
+    e.preventDefault();
+    const newFiles = Array.from(e.dataTransfer.files).filter(f => f.type === 'image/png');
+    if (newFiles.length > 0) {
+      setFiles(prev => [...prev, ...newFiles]);
+      setMessage(`Added ${newFiles.length} PNG(s)`);
+    } else {
+      setMessage('Please upload valid PNG files.');
+    }
+  }}
+  onClick={() => document.getElementById('png-file-input')?.click()}
+>
+  <p>
+    <strong>Drag & drop</strong> PNG images here (multiple allowed)
+    <br />
+    <span style={{ fontSize: '0.9em', color: '#666' }}>or click to browse</span>
+  </p>
+
+  <input
+    id="png-file-input"
+    type="file"
+    accept="image/png"
+    multiple
+    style={{ display: 'none' }}
+    onChange={(e) => {
+      const newFiles = Array.from(e.target.files || []);
+      if (newFiles.length > 0) {
+        setFiles(prev => [...prev, ...newFiles]);
+      }
+    }}
+  />
+</div>
+
+<div style={{ marginTop: '1.5rem' }}>
+  <button
+    type="button"
+    className="secondary-btn"
+    onClick={() => document.getElementById('png-file-input')?.click()}
+    style={{
+      padding: '0.75rem 1.5rem',
+      fontSize: '1rem',
+      backgroundColor: '#f0f0f0',
+      border: '2px dashed #ccc',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    }}
+  >
+    🖼️ Choose PNG Files
+  </button>
+</div>
+
+{files && files.length > 0 && (
+  <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
+    <strong>Selected:</strong> {files.length} PNG(s)
+  </div>
+)}
 
             <button
               className="primary-btn"

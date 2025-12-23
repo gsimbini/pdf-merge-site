@@ -1,7 +1,11 @@
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 // pages/pdf-to-word.js
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState } from 'react';
+import ProBadge from "../components/ProBadge";
+
 
 export default function PdfToWordPage() {
   const [file, setFile] = useState(null);
@@ -113,7 +117,7 @@ export default function PdfToWordPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">SP</span>
+            <span className="logo-circle">SPDF</span>
             <div>
               <h1>SimbaPDF</h1>
               <p className="tagline">Fast • Free • Secure PDF tools</p>
@@ -121,11 +125,13 @@ export default function PdfToWordPage() {
           </div>
           <nav className="nav">
             <Link href="/">Home</Link>
-            <Link href="/merge-pdf">Merge PDF</Link>
-            <Link href="/extract-text">Extract text</Link>
-            <Link href="/pdf-to-word">PDF to Word</Link>
-          </nav>
+            </nav>
         </header>
+
+<div style={{ marginTop: "0.75rem" }}>
+  <ProBadge />
+</div>
+
 
         <main className="main">
           <section className="tool-section">
@@ -142,45 +148,61 @@ export default function PdfToWordPage() {
             </div>
 
             <div
-              className="upload-box dropzone"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const f = e.dataTransfer.files?.[0];
-                if (f) {
-                  setFile(f);
-                  setMessage(`Selected: ${f.name} (${formatBytes(f.size)})`);
-                }
-              }}
-              onClick={() =>
-                document.getElementById('pdf-to-word-input')?.click()
-              }
-            >
-              <p>
-                <strong>Drag &amp; drop</strong> your PDF here, or click to
-                choose.
-              </p>
-              <input
-                id="pdf-to-word-input"
-                type="file"
-                accept="application/pdf"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) {
-                    setFile(f);
-                    setMessage(
-                      `Selected: ${f.name} (${formatBytes(f.size)})`
-                    );
-                  }
-                }}
-              />
-              {file && (
-                <ul className="file-list">
-                  <li>{file.name}</li>
-                </ul>
-              )}
-            </div>
+  className="upload-box dropzone"
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={(e) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files?.[0];
+    if (f && f.type === 'application/pdf') {
+      setFile(f);
+      setMessage(`Selected: ${f.name}`);
+    } else if (f) {
+      setMessage('Please upload a valid PDF file.');
+    }
+  }}
+  onClick={() => document.getElementById('pdf-to-word-file-input')?.click()}
+>
+  <p>
+    <strong>Drag & drop</strong> your PDF here
+    <br />
+    <span style={{ fontSize: '0.9em', color: '#666' }}>or click to browse</span>
+  </p>
+
+  <input
+    id="pdf-to-word-file-input"
+    type="file"
+    accept="application/pdf"
+    style={{ display: 'none' }}
+    onChange={(e) => {
+      const f = e.target.files?.[0];
+      if (f) setFile(f);
+    }}
+  />
+</div>
+
+<div style={{ marginTop: '1.5rem' }}>
+  <button
+    type="button"
+    className="secondary-btn"
+    onClick={() => document.getElementById('pdf-to-word-file-input')?.click()}
+    style={{
+      padding: '0.75rem 1.5rem',
+      fontSize: '1rem',
+      backgroundColor: '#f0f0f0',
+      border: '2px dashed #ccc',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    }}
+  >
+    📄 Choose PDF File
+  </button>
+</div>
+
+{file && (
+  <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
+    <strong>Selected:</strong> {file.name} ({formatBytes(file.size)})
+  </div>
+)}
 
             <button
               className="primary-btn"

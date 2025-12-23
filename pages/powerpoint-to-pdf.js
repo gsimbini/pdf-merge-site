@@ -1,3 +1,5 @@
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 // pages/powerpoint-to-pdf.js
 import Head from 'next/head';
 import Link from 'next/link';
@@ -145,9 +147,6 @@ export default function PowerPointToPdfPage() {
           </div>
           <nav className="nav">
             <Link href="/">Home</Link>
-            <Link href="/merge-pdf">Merge PDF</Link>
-            <Link href="/pdf-to-powerpoint">PDF to PowerPoint</Link>
-            <Link href="/powerpoint-to-pdf">PowerPoint to PDF</Link>
             <Link href="/pricing">Pricing</Link>
           </nav>
         </header>
@@ -185,38 +184,61 @@ export default function PowerPointToPdfPage() {
   <AdBanner slot="2169503342" />
 
             <div
-              className="upload-box dropzone"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                handleFiles(e.dataTransfer.files);
-              }}
-              onClick={() =>
-                document.getElementById('ppt-to-pdf-input')?.click()
-              }
-            >
-              <p>
-                <strong>Drag &amp; drop</strong> slide images here, or click to
-                choose (JPG, PNG, WEBP).
-              </p>
-              <input
-                id="ppt-to-pdf-input"
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/webp"
-                multiple
-                style={{ display: 'none' }}
-                onChange={(e) => handleFiles(e.target.files)}
-              />
-              {files.length > 0 && (
-                <ul className="file-list">
-                  {files.map((f, idx) => (
-                    <li key={idx}>
-                      {idx + 1}. {f.name} – {formatBytes(f.size)}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+  className="upload-box dropzone"
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={(e) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files?.[0];
+    if (f && f.name.endsWith('.pptx')) {
+      setFile(f);
+      setMessage(`Selected: ${f.name}`);
+    } else if (f) {
+      setMessage('Please upload a valid .pptx file.');
+    }
+  }}
+  onClick={() => document.getElementById('ppt-file-input')?.click()}
+>
+  <p>
+    <strong>Drag & drop</strong> your PowerPoint file here
+    <br />
+    <span style={{ fontSize: '0.9em', color: '#666' }}>or click to browse</span>
+  </p>
+
+  <input
+    id="ppt-file-input"
+    type="file"
+    accept=".pptx"
+    style={{ display: 'none' }}
+    onChange={(e) => {
+      const f = e.target.files?.[0];
+      if (f) setFile(f);
+    }}
+  />
+</div>
+
+<div style={{ marginTop: '1.5rem' }}>
+  <button
+    type="button"
+    className="secondary-btn"
+    onClick={() => document.getElementById('ppt-file-input')?.click()}
+    style={{
+      padding: '0.75rem 1.5rem',
+      fontSize: '1rem',
+      backgroundColor: '#f0f0f0',
+      border: '2px dashed #ccc',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    }}
+  >
+    📊 Choose PowerPoint File
+  </button>
+</div>
+
+{file && (
+  <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
+    <strong>Selected:</strong> {file.name} ({formatBytes(file.size)})
+  </div>
+)}
 
             <button
               className="primary-btn"

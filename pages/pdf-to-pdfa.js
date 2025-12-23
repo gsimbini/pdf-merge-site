@@ -1,3 +1,5 @@
+'use client';  // ← ADD THIS AT THE VERY TOP
+
 // pages/pdf-to-pdfa.js
 import Head from 'next/head';
 import Link from 'next/link';
@@ -187,7 +189,7 @@ export default function PdfToPdfaPage() {
       setMessage('Please upload a valid PDF file.');
     }
   }}
-  onClick={() => document.getElementById('pdf-pdfa-file-input')?.click()}
+  onClick={() => document.getElementById('pdf-to-pdfa-file-input')?.click()}
 >
   <p>
     <strong>Drag & drop</strong> your PDF here
@@ -196,7 +198,7 @@ export default function PdfToPdfaPage() {
   </p>
 
   <input
-    id="pdf-pdfa-file-input"
+    id="pdf-to-pdfa-file-input"
     type="file"
     accept="application/pdf"
     style={{ display: 'none' }}
@@ -214,7 +216,7 @@ export default function PdfToPdfaPage() {
   <button
     type="button"
     className="secondary-btn"
-    onClick={() => document.getElementById('pdf-pdfa-file-input')?.click()}
+    onClick={() => document.getElementById('pdf-to-pdfa-file-input')?.click()}
     style={{
       padding: '0.75rem 1.5rem',
       fontSize: '1rem',

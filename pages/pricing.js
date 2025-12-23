@@ -3,12 +3,26 @@ import Head from "next/head";
 import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
 import AdBanner from "../components/AdBanner";
-
+import ProBadge from "../components/ProBadge";
+import MagicLinkLogin from "../components/MagicLinkLogin";
 
 export default function PricingPage() {
   const [billing, setBilling] = useState("monthly"); // "monthly" | "yearly"
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Load last email used (helps users)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("simbapdf_email") || "";
+    if (saved) setEmail(saved);
+  }, []);
+
+  // Persist email so ads + pro status can be checked on all pages
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (email) localStorage.setItem("simbapdf_email", email.trim().toLowerCase());
+  }, [email]);
 
   async function goPayFast(plan) {
     try {
@@ -25,7 +39,7 @@ export default function PricingPage() {
         body: JSON.stringify({ plan, email }),
       });
 
-      const payload = await res.json();
+      const payload = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         alert(payload?.error || "Could not start PayFast checkout.");
@@ -102,20 +116,25 @@ export default function PricingPage() {
       <div className="page">
         <header className="header">
           <div className="brand">
-            <span className="logo-circle">SP</span>
+            <span className="logo-circle">SPDF</span>
             <div>
               <h1>SimbaPDF</h1>
               <p className="tagline">Fast • Free • Secure PDF tools</p>
             </div>
           </div>
 
-          <nav className="nav">
-            <Link href="/">Home</Link>
-            <Link href="/merge-pdf">Merge PDF</Link>
-            <Link href="/compress-pdf">Compress PDF</Link>
-            <Link href="/split-pdf">Split PDF</Link>
-            <Link href="/pricing">Pricing</Link>
-          </nav>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <nav className="nav">
+              <Link href="/">Home</Link>
+              <Link href="/merge-pdf">Merge PDF</Link>
+              <Link href="/compress-pdf">Compress PDF</Link>
+              <Link href="/split-pdf">Split PDF</Link>
+              <Link href="/pricing">Pricing</Link>
+              <Link href="/account">Account</Link>
+            </nav>
+
+            <ProBadge />
+          </div>
         </header>
 
         <main className="main">
@@ -126,13 +145,19 @@ export default function PricingPage() {
               If you want a cleaner experience, go Pro.
             </p>
 
+            {/* ✅ Magic Link Login block */}
+            <div style={{ marginTop: "1rem" }}>
+              <MagicLinkLogin />
+            </div>
+
             <AdBanner slot="9740145252" />
 
             {/* Email for activation */}
             <div className="upload-box" style={{ marginTop: "1rem" }}>
               <strong>Pro activation email</strong>
               <p className="hint" style={{ marginTop: "0.35rem" }}>
-                Enter the email that will be activated after PayFast confirms payment (ITN COMPLETE).
+                Enter the email that will be activated after PayFast confirms
+                payment (ITN COMPLETE).
               </p>
 
               <input

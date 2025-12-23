@@ -1,12 +1,10 @@
 // pages/api/payfast/itn.js
 import crypto from "crypto";
 import https from "https";
+import { createClient } from "@supabase/supabase-js";
 
-// IMPORTANT: PayFast ITN needs raw body for signature checks
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+  api: { bodyParser: false },
 };
 
 function readRawBody(req) {
@@ -40,7 +38,6 @@ function generateSignature(data, passphrase = "") {
     .join("&");
 
   const stringToSign = passphrase ? `${sorted}&passphrase=${pfEncode(passphrase)}` : sorted;
-
   return crypto.createHash("md5").update(stringToSign).digest("hex");
 }
 
@@ -49,7 +46,7 @@ function postToPayFastValidate(body, sandbox) {
   const path = "/eng/query/validate";
 
   return new Promise((resolve, reject) => {
-    const req = https.request(
+    const r = https.request(
       {
         method: "POST",
         host,
@@ -65,19 +62,17 @@ function postToPayFastValidate(body, sandbox) {
         res.on("end", () => resolve(out));
       }
     );
-    req.on("error", reject);
-    req.write(body);
-    req.end();
+    r.on("error", reject);
+    r.write(body);
+    r.end();
   });
 }
 
-// Optional: check if request IP is from PayFast
-// Note: On Vercel you often get the real client IP via x-forwarded-for.
-function getRequestIp(req) {
-  const xf = req.headers["x-forwarded-for"];
-  if (typeof xf === "string" && xf.length > 0) return xf.split(",")[0].trim();
-  if (Array.isArray(xf) && xf.length > 0) return xf[0];
-  return req.socket?.remoteAddress || "";
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+  return createClient(url, key, { auth: { persistSession: false } });
 }
 
 export default async function handler(req, res) {
@@ -87,42 +82,68 @@ export default async function handler(req, res) {
     const rawBody = await readRawBody(req);
     const data = parseFormEncoded(rawBody);
 
-    // 1) Signature verification (local)
-    const expected = generateSignature(data, process.env.PAYFAST_PASSPHRASE || "");
-    const received = data.signature || "";
+    const sandbox = process.env.PAYFAST_SANDBOX === "true";
+    const passphrase = process.env.PAYFAST_PASSPHRASE || "";
 
-    if (expected !== received) {
-      console.error("PayFast ITN: signature mismatch", { expected, received });
+    // 1) Local signature verification
+    const expectedSig = generateSignature(data, passphrase);
+    if ((data.signature || "") !== expectedSig) {
+      console.error("PayFast ITN: signature mismatch");
       return res.status(400).send("INVALID SIGNATURE");
     }
 
-    // 2) Optional: Server validation with PayFast
-    // PayFast recommends posting the exact received body back to /eng/query/validate.
-    const sandbox = process.env.PAYFAST_SANDBOX === "true";
+    // 2) Server validation with PayFast
     const validateResp = await postToPayFastValidate(rawBody, sandbox);
-
-    if (typeof validateResp !== "string" || !validateResp.includes("VALID")) {
+    if (!validateResp || !validateResp.includes("VALID")) {
       console.error("PayFast ITN: server validation failed:", validateResp);
       return res.status(400).send("INVALID ITN");
     }
 
-    // 3) Optional: basic status checks (don’t “activate pro” unless COMPLETE)
-    // Common statuses: COMPLETE, FAILED, PENDING
-    const paymentStatus = (data.payment_status || "").toUpperCase();
+    const paymentStatus = String(data.payment_status || "").toUpperCase();
+    const email = (data.custom_str1 || data.email_address || "").toLowerCase().trim();
+    const plan = (data.custom_str2 || "").toLowerCase();
 
-    // Helpful logs (safe)
-    console.log("PayFast ITN OK:", {
-      ip: getRequestIp(req),
-      m_payment_id: data.m_payment_id,
-      pf_payment_id: data.pf_payment_id,
+    // Always log validated ITNs
+    console.log("PayFast ITN VALID:", {
       payment_status: paymentStatus,
+      email,
+      plan,
+      pf_payment_id: data.pf_payment_id,
+      m_payment_id: data.m_payment_id,
       amount_gross: data.amount_gross,
       item_name: data.item_name,
-      email_address: data.email_address,
     });
 
-    // TODO next: activate Pro only when paymentStatus === "COMPLETE"
-    // and optionally verify amount/item_name against what you expect.
+    // 3) Activate ONLY when COMPLETE
+    if (paymentStatus === "COMPLETE") {
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+        console.error("PayFast ITN: COMPLETE but missing/invalid email");
+        return res.status(200).send("OK"); // acknowledge but don't activate
+      }
+
+      const supabase = getSupabase();
+
+      const row = {
+        email,
+        status: "active",
+        plan: plan === "yearly" ? "yearly" : "monthly",
+        pf_payment_id: data.pf_payment_id || null,
+        m_payment_id: data.m_payment_id || null,
+        amount_gross: data.amount_gross || null,
+        item_name: data.item_name || null,
+        payment_status: paymentStatus,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
+        .from("pro_subscriptions")
+        .upsert(row, { onConflict: "email" });
+
+      if (error) {
+        console.error("Supabase upsert error:", error);
+        // still return OK so PayFast doesn't retry forever
+      }
+    }
 
     return res.status(200).send("OK");
   } catch (err) {

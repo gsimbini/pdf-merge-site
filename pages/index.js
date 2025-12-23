@@ -281,6 +281,38 @@ export default function HomePage() {
             </div>
           </section>
 
+          {/* TradingView Ticker Bar */}
+          <section className="tool-section" style={{ padding: '0', margin: '2rem 0' }}>
+            <div 
+              dangerouslySetInnerHTML={{
+                __html: `
+                  <!-- TradingView Ticker Tape Widget -->
+                  <div class="tradingview-widget-container" style="height:60px; width:100%;">
+                    <div class="tradingview-widget-container__widget" style="height:100%;"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                    {
+                      "symbols": [
+                        { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
+                        { "proName": "FOREXCOM:NSXUSD", "title": "Nasdaq" },
+                        { "proName": "FOREXCOM:DJI", "title": "Dow Jones" },
+                        { "proName": "FX:EURUSD", "title": "EUR/USD" },
+                        { "proName": "FX:GBPUSD", "title": "GBP/USD" },
+                        { "proName": "FX:USDZAR", "title": "USD/ZAR" },
+                        { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
+                        { "proName": "BITSTAMP:ETHUSD", "title": "Ethereum" }
+                      ],
+                      "colorTheme": "dark",
+                      "isTransparent": true,
+                      "showSymbolLogo": true,
+                      "locale": "en"
+                    }
+                    </script>
+                  </div>
+                `
+              }}
+            />
+          </section>
+
           {/* Daily Motivational Quote */}
           <section className="tool-section" style={{ background: '#f8f9fa', padding: '2.5rem 2rem', borderRadius: '16px', margin: '2rem 0', textAlign: 'center' }}>
             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.8rem', color: '#333' }}>

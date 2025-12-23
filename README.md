@@ -1,4 +1,4 @@
-# PDFFusion - Free PDF Merge Site (Coded)
+# SimbaPDF - Free PDF Merge Site (Coded)
 
 This is a minimal Next.js project that provides a **free online PDF merge tool**
 with placeholders for future tools (compress, split) and monetisation slots.

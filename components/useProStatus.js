@@ -1,10 +1,11 @@
 // components/useProStatus.js
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { getSupabase } from "../lib/supabaseClient";
 
 export default function useProStatus() {
-  const [loading, setLoading] = useState(false);
-  const [isPro, setIsPro] = useState(false);
+  // Start with null to indicate "unknown" during SSR
+  const [isPro, setIsPro] = useState(null); // ← Changed from false to null
+  const [loading, setLoading] = useState(true); // Start as loading
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -12,43 +13,47 @@ export default function useProStatus() {
 
     async function check() {
       try {
-        // SSR/build guard
-        if (typeof window === "undefined") return;
-
-        setLoading(true);
-        setError("");
-
-        // ✅ MUST be inside async function
-        const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
-        if (sessionErr) throw sessionErr;
-
-        const userEmail = sessionData?.session?.user?.email?.toLowerCase() || "";
-
-        // If not signed in, user is not Pro (prevents email spoofing)
-        if (!userEmail) {
-          if (!cancelled) setIsPro(false);
+        // This effect only runs on client anyway, but safe guard
+        const supabase = getSupabase();
+        if (!supabase) {
+          if (!cancelled) {
+            setIsPro(false);
+            setLoading(false);
+          }
           return;
         }
 
-        // Keep email in localStorage for UI convenience
-        localStorage.setItem("simbapdf_email", userEmail);
+        const { data: sessionData, error: sessionErr } =
+          await supabase.auth.getSession();
+        if (sessionErr) throw sessionErr;
 
-        // Query your server (Supabase service role key stays server-side)
-        const res = await fetch(`/api/pro/status?email=${encodeURIComponent(userEmail)}`);
-        const json = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-          throw new Error(json?.error || "Failed to check Pro status");
+        const userEmail = sessionData?.session?.user?.email?.toLowerCase() || "";
+        if (!userEmail) {
+          if (!cancelled) {
+            setIsPro(false);
+            setLoading(false);
+          }
+          return;
         }
 
-        if (!cancelled) setIsPro(Boolean(json?.isPro));
+        localStorage.setItem("simbapdf_email", userEmail);
+
+        const res = await fetch(
+          `/api/pro/status?email=${encodeURIComponent(userEmail)}`
+        );
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(json?.error || "Failed to check Pro status");
+
+        if (!cancelled) {
+          setIsPro(Boolean(json?.isPro));
+          setLoading(false);
+        }
       } catch (e) {
         if (!cancelled) {
           setIsPro(false);
           setError(e?.message || "Error");
+          setLoading(false);
         }
-      } finally {
-        if (!cancelled) setLoading(false);
       }
     }
 
@@ -59,5 +64,10 @@ export default function useProStatus() {
     };
   }, []);
 
-  return { loading, isPro, error };
+  // Return isPro as boolean, but treat null as false for rendering safety
+  return {
+    loading,
+    isPro: Boolean(isPro), // null → false, true → true, false → false
+    error,
+  };
 }

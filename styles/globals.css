@@ -18,6 +18,48 @@ html, body {
   padding: 1rem 1rem 4rem;
 }
 
+.secondary-btn {
+  background: white;
+  border: 2px dashed #007bff;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.secondary-btn:hover {
+  background: #007bff;
+  color: white;
+}
+.secondary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.upload-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.upload-box.dropzone {
+  border: 3px dashed #aaa;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  background: #fafafa;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-box.dropzone:hover {
+  border-color: #007bff;
+  background: #f0f8ff;
+}
+
+.upload-box.dropzone p {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #444;
+}
+
+
 /* HEADER */
 .header {
   display: flex;
@@ -269,3 +311,25 @@ html, body {
   font-weight: 700;
 }
 
+/* Leopard print navigation background */
+.nav.leopard {
+  background-color: #b08968;
+  background-image:
+    radial-gradient(circle, rgba(0,0,0,0.18) 20%, transparent 21%),
+    radial-gradient(circle, rgba(0,0,0,0.18) 20%, transparent 21%);
+  background-size: 90px 90px;
+  background-position: 0 0, 45px 45px;
+  border-radius: 14px;
+  padding: 0.6rem 1rem;
+}
+
+
+.nav.leopard a {
+  color: #1f1408;
+  font-weight: 600;
+}
+
+.nav.leopard a:hover {
+  color: #000;
+  text-decoration: underline;
+}

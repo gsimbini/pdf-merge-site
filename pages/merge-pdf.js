@@ -136,25 +136,66 @@ export default function MergePdfPage() {
             {/* 🔹 Inline tools ad (top/middle of page) */}
   <AdBanner slot="2169503342" />
 
-            <div className="upload-box">
-              <input
-                type="file"
-                accept="application/pdf"
-                multiple
-                onChange={handleFileChange}
-              />
-              <p className="hint">
-                Tip: Hold <code>Ctrl</code> or <code>Shift</code> to select
-                multiple files.
-              </p>
-              {files.length > 0 && (
-                <ul className="file-list">
-                  {files.map((file, idx) => (
-                    <li key={idx}>{file.name}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <div
+  className="upload-box dropzone"
+  onDragOver={(e) => e.preventDefault()}
+  onDrop={(e) => {
+    e.preventDefault();
+    const newFiles = Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf');
+    if (newFiles.length > 0) {
+      setFiles(prev => [...prev, ...newFiles]);
+      setMessage(`Added ${newFiles.length} PDF(s)`);
+    } else {
+      setMessage('Please upload valid PDF files.');
+    }
+  }}
+  onClick={() => document.getElementById('merge-file-input')?.click()}
+>
+  <p>
+    <strong>Drag & drop</strong> PDFs here (multiple allowed)
+    <br />
+    <span style={{ fontSize: '0.9em', color: '#666' }}>or click to browse</span>
+  </p>
+
+  <input
+    id="merge-file-input"
+    type="file"
+    accept="application/pdf"
+    multiple
+    style={{ display: 'none' }}
+    onChange={(e) => {
+      const newFiles = Array.from(e.target.files || []);
+      if (newFiles.length > 0) {
+        setFiles(prev => [...prev, ...newFiles]);
+        setMessage(`Added ${newFiles.length} PDF(s)`);
+      }
+    }}
+  />
+</div>
+
+<div style={{ marginTop: '1.5rem' }}>
+  <button
+    type="button"
+    className="secondary-btn"
+    onClick={() => document.getElementById('merge-file-input')?.click()}
+    style={{
+      padding: '0.75rem 1.5rem',
+      fontSize: '1rem',
+      backgroundColor: '#f0f0f0',
+      border: '2px dashed #ccc',
+      borderRadius: '8px',
+      cursor: 'pointer',
+    }}
+  >
+    📄 Add PDF Files
+  </button>
+</div>
+
+{files && files.length > 0 && (
+  <div style={{ marginTop: '1rem', fontSize: '1.1rem', color: '#333' }}>
+    <strong>Selected:</strong> {files.length} PDF(s)
+  </div>
+)}
 
             <button
               className="primary-btn"

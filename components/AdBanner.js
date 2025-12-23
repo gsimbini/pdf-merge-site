@@ -1,45 +1,45 @@
 // components/AdBanner.js
-import { useEffect, useState } from "react";
-import Script from "next/script";
+import { useEffect, useRef } from "react";
 import useProStatus from "./useProStatus";
 
 export default function AdBanner({ slot }) {
-  const [mounted, setMounted] = useState(false);
   const { isPro } = useProStatus();
+  const pushedRef = useRef(false);
 
-  const client = "ca-pub-9212010274013202";
+  // No slot → nothing
+  if (!slot) {
+    return null;
+  }
 
+  // While pro status is still loading (null = initial state), show a placeholder
+  // to keep layout consistent and prevent hydration mismatch
+  if (isPro === null) {
+    return (
+      <div style={{ width: "100%", margin: "1rem 0", minHeight: "90px" }} />
+    );
+  }
+
+  // Pro user → completely hide ads
+  if (isPro) {
+    return null;
+  }
+
+  // Free user → load and show the ad (only on client)
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // ✅ Hooks must be before any conditional returns
-  useEffect(() => {
-    if (!mounted) return;
-    if (isPro) return;
-    if (!slot) return;
-    if (typeof window === "undefined") return;
+    if (pushedRef.current) return;
 
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
+      pushedRef.current = true;
     } catch (e) {
-      // ignore
+      console.warn("AdSense push ignored:", e);
     }
-  }, [mounted, isPro, slot]);
+  }, []);
 
-  // ✅ Now safe to return conditionally
-  if (!mounted || isPro || !slot) return null;
+  const client = "ca-pub-9212010274013202";
 
   return (
-    <div style={{ width: "100%", margin: "1rem 0", minHeight: "90px" }}>
-      <Script
-        id="adsbygoogle-loader"
-        async
-        strategy="afterInteractive"
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`}
-        crossOrigin="anonymous"
-      />
-
+    <div style={{ width: "100%", margin: "1rem 0", minHeight: "90px", textAlign: "center" }}>
       <ins
         className="adsbygoogle"
         style={{ display: "block", width: "100%" }}

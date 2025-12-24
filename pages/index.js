@@ -1,7 +1,7 @@
 // pages/index.js
 import Head from 'next/head';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AdBanner from '../components/AdBanner';
 import ProBadge from "../components/ProBadge";
 
@@ -10,10 +10,57 @@ export default function HomePage() {
   const [quote, setQuote] = useState(null);
   const [quoteLoading, setQuoteLoading] = useState(true);
 
-  const q = search.trim().toLowerCase();
+  const tickerRef = useRef(null);
 
   useEffect(() => {
-    fetch('https://zenquotes.io/api/random')
+    if (!tickerRef.current) return;
+
+    // Prevent duplicate scripts
+    if (tickerRef.current.querySelector('script')) return;
+
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+    script.type = 'text/javascript';
+    script.async = true;
+
+    const config = {
+      symbols: [
+        { proName: "INDEX:SPX", title: "S&P 500" },
+        { proName: "NASDAQ:IXIC", title: "Nasdaq" },
+        { proName: "INDEX:DJI", title: "Dow Jones" },
+        { proName: "FX:EURUSD", title: "EUR/USD" },
+        { proName: "FX:GBPUSD", title: "GBP/USD" },
+        { proName: "FX:USDZAR", title: "USD/ZAR" },
+        { proName: "BITSTAMP:BTCUSD", title: "Bitcoin" },
+        { proName: "BITSTAMP:ETHUSD", title: "Ethereum" },
+        { proName: "NASDAQ:AAPL", title: "Apple" },
+        { proName: "NASDAQ:TSLA", title: "Tesla" },
+        { proName: "NASDAQ:GOOGL", title: "Google" },
+        { proName: "NASDAQ:MSFT", title: "Microsoft" },
+        { proName: "BINANCE:BNBUSDT", title: "Binance Coin" },
+        { proName: "TVC:GOLD", title: "Gold" },
+        { proName: "FX:AUDUSD", title: "AUD/USD" }
+      ],
+      showSymbolLogo: true,
+      colorTheme: "dark",
+      isTransparent: false,
+      displayMode: "adaptive",
+      locale: "en"
+    };
+
+    script.innerHTML = JSON.stringify(config);
+    tickerRef.current.appendChild(script);
+
+    // Cleanup
+    return () => {
+      if (tickerRef.current) {
+        tickerRef.current.innerHTML = '';
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    fetch('https://zenquotes.io/api/today')
       .then(res => res.json())
       .then(data => {
         if (data && data[0]) {
@@ -29,6 +76,8 @@ export default function HomePage() {
         setQuoteLoading(false);
       });
   }, []);
+
+  const q = search.trim().toLowerCase();
 
   const popularTools = [
     { href: '/merge-pdf', title: 'Merge PDF', description: 'Combine multiple PDFs into a single document.' },
@@ -94,7 +143,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <meta name="google-adsense-account" content="ca-pub-9212010274013202"></meta>
+        <meta name="google-adsense-account" content="ca-pub-9212010274013202" />
         <title>SimbaPDF – Free Online PDF Tools</title>
         <meta
           name="description"
@@ -108,7 +157,7 @@ export default function HomePage() {
             <span className="logo-circle">SPDF</span>
             <div>
               <h1>SimbaPDF</h1>
-              <p className="tagline">Free &amp; private online PDF tools</p>
+              <p className="tagline">Free & private online PDF tools</p>
             </div>
           </div>
           <nav className="nav">
@@ -151,39 +200,33 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* TradingView Ticker Bar - Fixed */}
-          <section className="tool-section" style={{ padding: '0', margin: '2rem 0' }}>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: `
-                  <!-- TradingView Ticker Tape Widget -->
-                  <div class="tradingview-widget-container" style="height:70px;width:100%;">
-                    <div class="tradingview-widget-container__widget" style="height:100%;"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                    {
-                      "symbols": [
-                        {"proName": "FOREXCOM:SPXUSD", "title": "S&P 500"},
-                        {"proName": "FOREXCOM:NSXUSD", "title": "Nasdaq"},
-                        {"proName": "FOREXCOM:DJI", "title": "Dow Jones"},
-                        {"proName": "FX:EURUSD", "title": "EUR/USD"},
-                        {"proName": "FX:GBPUSD", "title": "GBP/USD"},
-                        {"proName": "FX:USDZAR", "title": "USD/ZAR"},
-                        {"proName": "BITSTAMP:BTCUSD", "title": "Bitcoin"},
-                        {"proName": "BITSTAMP:ETHUSD", "title": "Ethereum"},
-                        {"proName": "NASDAQ:AAPL", "title": "Apple"},
-                        {"proName": "NASDAQ:TSLA", "title": "Tesla"},
-                        {"proName": "NASDAQ:GOOGL", "title": "Google"}
-                      ],
-                      "colorTheme": "dark",
-                      "isTransparent": false,
-                      "showSymbolLogo": true,
-                      "locale": "en"
-                    }
-                    </script>
-                  </div>
-                `
-              }}
-            />
+          {/* TradingView Ticker Tape – continuous scrolling bar */}
+          <section 
+            className="tool-section" 
+            style={{ 
+              padding: '0', 
+              margin: '2rem 0', 
+              background: '#050000ff', 
+              overflow: 'hidden',
+              height: '70px'  // Increased for better visibility (logos/prices/text)
+            }}
+          >
+            <div 
+              ref={tickerRef}
+              className="tradingview-widget-container" 
+              style={{ height: '100%', width: '100%' }}
+            >
+              <div className="tradingview-widget-container__widget"></div>
+              <div className="tradingview-widget-copyright">
+                <a 
+                  href="https://www.tradingview.com/" 
+                  rel="noopener nofollow" 
+                  target="_blank"
+                >
+                  <span className="blue-text">Track all markets on TradingView</span>
+                </a>
+              </div>
+            </div>
           </section>
 
           {/* Daily Motivational Quote */}
@@ -200,6 +243,9 @@ export default function HomePage() {
                 </p>
                 <p style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#0070f3' }}>
                   — {quote.a}
+                </p>
+                <p style={{ fontSize: '0.9rem', color: '#888', marginTop: '1.5rem' }}>
+                  Powered by <a href="https://zenquotes.io/" target="_blank" rel="noopener noreferrer" style={{ color: '#0070f3' }}>ZenQuotes.io</a>
                 </p>
               </div>
             ) : (
@@ -240,7 +286,7 @@ export default function HomePage() {
 
           {filteredEdit.length > 0 && (
             <section className="tool-section">
-              <h3>Edit &amp; organise pages</h3>
+              <h3>Edit & organise pages</h3>
               <div className="tool-grid">
                 {filteredEdit.map((tool) => (
                   <Link key={tool.href} href={tool.href} className="tool-card" style={cardStyle}>
@@ -254,7 +300,7 @@ export default function HomePage() {
 
           {filteredSecurity.length > 0 && (
             <section className="tool-section">
-              <h3>Security &amp; labels</h3>
+              <h3>Security & labels</h3>
               <div className="tool-grid">
                 {filteredSecurity.map((tool) => (
                   <Link key={tool.href} href={tool.href} className="tool-card" style={cardStyle}>
@@ -268,7 +314,7 @@ export default function HomePage() {
 
           {filteredImages.length > 0 && (
             <section className="tool-section">
-              <h3>Images &amp; PDF</h3>
+              <h3>Images & PDF</h3>
               <div className="tool-grid">
                 {filteredImages.map((tool) => (
                   <Link key={tool.href} href={tool.href} className="tool-card" style={cardStyle}>
@@ -282,7 +328,7 @@ export default function HomePage() {
 
           {filteredTextOffice.length > 0 && (
             <section className="tool-section">
-              <h3>Text &amp; Office conversions</h3>
+              <h3>Text & Office conversions</h3>
               <div className="tool-grid">
                 {filteredTextOffice.map((tool) => (
                   <Link key={tool.href} href={tool.href} className="tool-card" style={cardStyle}>

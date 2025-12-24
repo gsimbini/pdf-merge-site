@@ -1,6 +1,8 @@
 // pages/cv-builder.js
 import Head from 'next/head';
+import Link from 'next/link';
 import { useState } from 'react';
+import ProBadge from "../components/ProBadge";
 
 export default function CVBuilder() {
   const [formData, setFormData] = useState({
@@ -81,112 +83,138 @@ export default function CVBuilder() {
         />
       </Head>
 
-      <div style={{
-        minHeight: '100vh',
-        background: '#f8f9fa',
-        padding: '1rem',
-        fontFamily: 'system-ui, -apple-system, sans-serif'
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h1 style={{ textAlign: 'center', margin: '1.5rem 0 2rem' }}>
-            Create Your Resume
-          </h1>
-
-          <div className="cv-layout">
-            {/* LEFT – FORM */}
-            <div className="form-panel">
-              <h2 style={{ marginTop: 0 }}>Your Information</h2>
-
-              {/* Template chooser */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                  Choose a template:
-                </label>
-                <select
-                  value={selectedTemplate}
-                  onChange={e => setSelectedTemplate(e.target.value)}
-                  style={{ width: '100%', padding: '0.6rem', fontSize: '1rem' }}
-                >
-                  <option value="modern">Modern Clean</option>
-                  <option value="classic">Classic Professional</option>
-                  <option value="sidebar">Creative Sidebar</option>
-                </select>
-              </div>
-
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                <input name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleChange} style={{ padding: '0.7rem', fontSize: '1.1rem' }} />
-                <input name="jobTitle" placeholder="Desired Job Title" value={formData.jobTitle} onChange={handleChange} />
-                <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
-                <input name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} />
-                <input name="location" placeholder="Location" value={formData.location} onChange={handleChange} />
-                <input name="linkedin" placeholder="LinkedIn URL" value={formData.linkedin} onChange={handleChange} />
-                <input name="github" placeholder="GitHub URL (optional)" value={formData.github} onChange={handleChange} />
-
-                <textarea name="summary" placeholder="Professional Summary" value={formData.summary} onChange={handleChange} rows={4} style={{ padding: '0.7rem' }} />
-              </div>
-
-              {/* Experience */}
-              <div style={{ margin: '2rem 0' }}>
-                <h3>Experience</h3>
-                {formData.experience.map((exp, index) => (
-                  <div key={index} style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-                    <input placeholder="Company Name" value={exp.company} onChange={e => handleArrayChange(index, 'company', e.target.value, 'experience')} style={{ width: '100%', marginBottom: '0.5rem' }} />
-                    <input placeholder="Position" value={exp.position} onChange={e => handleArrayChange(index, 'position', e.target.value, 'experience')} />
-                    <input placeholder="Dates (e.g. Jan 2022 – Present)" value={exp.dates} onChange={e => handleArrayChange(index, 'dates', e.target.value, 'experience')} />
-                    <textarea placeholder="Description (use • for bullets)" value={exp.description} onChange={e => handleArrayChange(index, 'description', e.target.value, 'experience')} rows={3} style={{ width: '100%', marginTop: '0.5rem' }} />
-                  </div>
-                ))}
-                <button onClick={() => addEntry('experience')} style={{ padding: '0.6rem 1.2rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '6px' }}>
-                  + Add Experience
-                </button>
-              </div>
-
-              {/* Education */}
-              <div style={{ margin: '2rem 0' }}>
-                <h3>Education</h3>
-                {formData.education.map((edu, index) => (
-                  <div key={index} style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-                    <input placeholder="School / University" value={edu.school} onChange={e => handleArrayChange(index, 'school', e.target.value, 'education')} style={{ width: '100%', marginBottom: '0.5rem' }} />
-                    <input placeholder="Degree" value={edu.degree} onChange={e => handleArrayChange(index, 'degree', e.target.value, 'education')} style={{ width: '100%', marginBottom: '0.5rem' }} />
-                    <input placeholder="Dates (e.g. 2017 – 2020)" value={edu.dates} onChange={e => handleArrayChange(index, 'dates', e.target.value, 'education')} style={{ width: '100%', marginBottom: '0.5rem' }} />
-                    <textarea placeholder="Description / Achievements" value={edu.description || ''} onChange={e => handleArrayChange(index, 'description', e.target.value, 'education')} rows={2} style={{ width: '100%', marginTop: '0.5rem' }} />
-                  </div>
-                ))}
-                <button onClick={() => addEntry('education')} style={{ padding: '0.6rem 1.2rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '6px' }}>
-                  + Add Education
-                </button>
-              </div>
-
-              {/* Skills */}
-              <div>
-                <h3>Skills</h3>
-                <textarea name="skills" placeholder="React, JavaScript, Tailwind CSS, Git..." value={formData.skills} onChange={handleChange} rows={3} style={{ width: '100%' }} />
-              </div>
+      <div className="page">
+        {/* Header – same as index.js */}
+        <header className="header">
+          <div className="brand">
+            <span className="logo-circle">SPDF</span>
+            <div>
+              <h1>SimbaPDF</h1>
+              <p className="tagline">Free & private online PDF tools</p>
             </div>
+          </div>
+          <nav className="nav">
+            <Link href="/">Home</Link>
+            <Link href="/pricing">Pricing</Link>
+            <Link href="/login">Login</Link>
+            <Link href="/account">Account</Link>
+          </nav>
+        </header>
 
-            {/* RIGHT – PREVIEW */}
-            <div className="preview-panel">
-              <h2 style={{ textAlign: 'center', marginTop: 0 }}>Preview</h2>
+        {/* Pro Badge */}
+        <div style={{ marginTop: "0.75rem", textAlign: "center" }}>
+          <ProBadge />
+        </div>
 
-              <div id="cv-preview" className="cv-preview-content">
-                {selectedTemplate === 'modern' && <ModernTemplate data={formData} />}
-                {selectedTemplate === 'classic' && <ClassicTemplate data={formData} />}
-                {selectedTemplate === 'sidebar' && <SidebarTemplate data={formData} />}
+        {/* Main content */}
+        <main className="main" style={{ padding: '1rem' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <h1 style={{ textAlign: 'center', margin: '1.5rem 0 2rem' }}>
+              Create Your Resume
+            </h1>
+
+            <div className="cv-layout">
+              {/* LEFT – FORM */}
+              <div className="form-panel">
+                <h2 style={{ marginTop: 0 }}>Your Information</h2>
+
+                {/* Template chooser */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                    Choose a template:
+                  </label>
+                  <select
+                    value={selectedTemplate}
+                    onChange={e => setSelectedTemplate(e.target.value)}
+                    style={{ width: '100%', padding: '0.6rem', fontSize: '1rem' }}
+                  >
+                    <option value="modern">Modern Clean</option>
+                    <option value="classic">Classic Professional</option>
+                    <option value="sidebar">Creative Sidebar</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'grid', gap: '1rem' }}>
+                  <input name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleChange} style={{ padding: '0.7rem', fontSize: '1.1rem' }} />
+                  <input name="jobTitle" placeholder="Desired Job Title" value={formData.jobTitle} onChange={handleChange} />
+                  <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
+                  <input name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} />
+                  <input name="location" placeholder="Location" value={formData.location} onChange={handleChange} />
+                  <input name="linkedin" placeholder="LinkedIn URL" value={formData.linkedin} onChange={handleChange} />
+                  <input name="github" placeholder="GitHub URL (optional)" value={formData.github} onChange={handleChange} />
+
+                  <textarea name="summary" placeholder="Professional Summary" value={formData.summary} onChange={handleChange} rows={4} style={{ padding: '0.7rem' }} />
+                </div>
+
+                {/* Experience */}
+                <div style={{ margin: '2rem 0' }}>
+                  <h3>Experience</h3>
+                  {formData.experience.map((exp, index) => (
+                    <div key={index} style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
+                      <input placeholder="Company Name" value={exp.company} onChange={e => handleArrayChange(index, 'company', e.target.value, 'experience')} style={{ width: '100%', marginBottom: '0.5rem' }} />
+                      <input placeholder="Position" value={exp.position} onChange={e => handleArrayChange(index, 'position', e.target.value, 'experience')} />
+                      <input placeholder="Dates (e.g. Jan 2022 – Present)" value={exp.dates} onChange={e => handleArrayChange(index, 'dates', e.target.value, 'experience')} />
+                      <textarea placeholder="Description (use • for bullets)" value={exp.description} onChange={e => handleArrayChange(index, 'description', e.target.value, 'experience')} rows={3} style={{ width: '100%', marginTop: '0.5rem' }} />
+                    </div>
+                  ))}
+                  <button onClick={() => addEntry('experience')} style={{ padding: '0.6rem 1.2rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '6px' }}>
+                    + Add Experience
+                  </button>
+                </div>
+
+                {/* Education */}
+                <div style={{ margin: '2rem 0' }}>
+                  <h3>Education</h3>
+                  {formData.education.map((edu, index) => (
+                    <div key={index} style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
+                      <input placeholder="School / University" value={edu.school} onChange={e => handleArrayChange(index, 'school', e.target.value, 'education')} style={{ width: '100%', marginBottom: '0.5rem' }} />
+                      <input placeholder="Degree" value={edu.degree} onChange={e => handleArrayChange(index, 'degree', e.target.value, 'education')} style={{ width: '100%', marginBottom: '0.5rem' }} />
+                      <input placeholder="Dates (e.g. 2017 – 2020)" value={edu.dates} onChange={e => handleArrayChange(index, 'dates', e.target.value, 'education')} style={{ width: '100%', marginBottom: '0.5rem' }} />
+                      <textarea placeholder="Description / Achievements" value={edu.description || ''} onChange={e => handleArrayChange(index, 'description', e.target.value, 'education')} rows={2} style={{ width: '100%', marginTop: '0.5rem' }} />
+                    </div>
+                  ))}
+                  <button onClick={() => addEntry('education')} style={{ padding: '0.6rem 1.2rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '6px' }}>
+                    + Add Education
+                  </button>
+                </div>
+
+                {/* Skills */}
+                <div>
+                  <h3>Skills</h3>
+                  <textarea name="skills" placeholder="React, JavaScript, Tailwind CSS, Git..." value={formData.skills} onChange={handleChange} rows={3} style={{ width: '100%' }} />
+                </div>
               </div>
 
-              <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                <button onClick={downloadPDF} className="download-btn">
-                  Download PDF (Print → Save as PDF)
-                </button>
-                <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '1rem' }}>
-                  Use your browser's "Save as PDF" option in the print dialog
-                </p>
+              {/* RIGHT – PREVIEW */}
+              <div className="preview-panel">
+                <h2 style={{ textAlign: 'center', marginTop: 0 }}>Preview</h2>
+
+                <div id="cv-preview" className="cv-preview-content">
+                  {selectedTemplate === 'modern' && <ModernTemplate data={formData} />}
+                  {selectedTemplate === 'classic' && <ClassicTemplate data={formData} />}
+                  {selectedTemplate === 'sidebar' && <SidebarTemplate data={formData} />}
+                </div>
+
+                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                  <button onClick={downloadPDF} className="download-btn">
+                    Download PDF (Print → Save as PDF)
+                  </button>
+                  <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '1rem' }}>
+                    Use your browser's "Save as PDF" option in the print dialog
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </main>
+
+        {/* Footer – same as index.js */}
+        <footer className="footer">
+          <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
+        </footer>
       </div>
 
+      {/* Print styles */}
       <style jsx global>{`
         .cv-layout {
           display: flex;
@@ -262,7 +290,7 @@ export default function CVBuilder() {
 }
 
 // ────────────────────────────────────────────────
-// Template components (unchanged)
+// Template components (unchanged from your version)
 // ────────────────────────────────────────────────
 
 function ModernTemplate({ data }) {

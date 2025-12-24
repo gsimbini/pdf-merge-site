@@ -80,6 +80,7 @@ export default function HomePage() {
   const q = search.trim().toLowerCase();
 
   const popularTools = [
+    { href: '/cv-builder', title: 'Create CV / Resume', description: 'Build a professional resume with multiple templates – export as PDF in your browser.' },
     { href: '/merge-pdf', title: 'Merge PDF', description: 'Combine multiple PDFs into a single document.' },
     { href: '/pdf-to-pdfa', title: 'PDF to PDF/A (basic)', description: 'Create a simple archival-style copy of a PDF (browser-only, not strict validator-grade).' },
     { href: '/split-pdf', title: 'Split PDF', description: 'Extract selected pages or ranges into a new PDF.' },
@@ -147,7 +148,7 @@ export default function HomePage() {
         <title>SimbaPDF – Free Online PDF Tools</title>
         <meta
           name="description"
-          content="SimbaPDF offers free, private, in-browser PDF tools: merge, split, compress, convert images, add text and more."
+          content="SimbaPDF offers free, private, in-browser PDF tools: merge, split, compress, convert images, add text, create resumes and more."
         />
       </Head>
 
@@ -193,7 +194,7 @@ export default function HomePage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="text-input"
-                  placeholder="Type e.g. merge, jpg, rotate, excel…"
+                  placeholder="Type e.g. merge, jpg, rotate, excel, cv, resume…"
                   style={{ marginTop: '0.4rem', width: '100%' }}
                 />
               </label>
@@ -208,7 +209,7 @@ export default function HomePage() {
               margin: '2rem 0', 
               background: '#050000ff', 
               overflow: 'hidden',
-              height: '70px'  // Increased for better visibility (logos/prices/text)
+              height: '70px'
             }}
           >
             <div 
@@ -261,7 +262,7 @@ export default function HomePage() {
             <section className="tool-section">
               <p className="hint">
                 No tools match &quot;{search}&quot;. Try a different search
-                (for example: merge, split, jpg, word, excel…).
+                (for example: merge, split, jpg, word, excel, cv, resume…).
               </p>
             </section>
           )}

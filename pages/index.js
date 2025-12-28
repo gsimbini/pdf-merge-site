@@ -166,7 +166,6 @@ export default function HomePage() {
           <nav className="nav">
             <Link href="/">Home</Link>
             <Link href="/pricing">Pricing</Link>
-            <Link href="/invoice">Invoice Generator</Link>
             <Link href="/login">Login</Link>
             <Link href="/account">Account</Link>
           </nav>

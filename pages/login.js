@@ -3,23 +3,16 @@
 // pages/login.js
 import Head from 'next/head';
 import Link from 'next/link';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getSupabase } from "../lib/supabaseClient";
 import ProBadge from "../components/ProBadge";
 import AdBanner from "../components/AdBanner";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-
-  // Pre-fill email from localStorage if available
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const saved = localStorage.getItem("simbapdf_email") || "";
-    if (saved) setEmail(saved);
-  }, []);
 
   // Google Sign-In
   async function signInWithGoogle() {
@@ -42,20 +35,19 @@ export default function LoginPage() {
       });
 
       if (error) throw error;
-      // Redirect happens automatically
+      // Redirect happens automatically via Supabase
     } catch (e) {
       setError(e?.message || "Google sign-in failed. Please try again.");
       setBusy(false);
     }
   }
 
-  // Magic Link Sign-In
-  async function sendMagicLink() {
+  // Email + Password Login
+  async function handleLogin() {
     setError("");
-    setSent(false);
 
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      setError("Please enter a valid email address.");
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter both email and password.");
       return;
     }
 
@@ -69,19 +61,17 @@ export default function LoginPage() {
         return;
       }
 
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+        password: password.trim(),
       });
 
       if (error) throw error;
 
-      setSent(true);
-      localStorage.setItem("simbapdf_email", email.trim().toLowerCase());
+      // Success - redirect to account
+      window.location.href = "/account";
     } catch (e) {
-      setError(e?.message || "Failed to send magic link. Please try again.");
+      setError(e?.message || "Login failed. Please check your email and password.");
     } finally {
       setBusy(false);
     }
@@ -91,7 +81,7 @@ export default function LoginPage() {
     <>
       <Head>
         <title>Login - SimbaPDF</title>
-        <meta name="description" content="Login to SimbaPDF using Google or email magic link." />
+        <meta name="description" content="Sign in to SimbaPDF with Google or your email and password." />
       </Head>
 
       <div className="page">
@@ -116,81 +106,111 @@ export default function LoginPage() {
         </header>
 
         <main className="main">
-          <section className="tool-section">
-            <h2>Sign in to SimbaPDF</h2>
-            <p className="hint">
-              Unlock Pro features across devices, manage your subscription, and remove ads.
+          <section className="tool-section" style={{ maxWidth: '420px', margin: '0 auto', textAlign: 'center' }}>
+            <h2 style={{ marginBottom: '0.5rem' }}>Sign in to SimbaPDF</h2>
+            <p style={{ color: '#666', marginBottom: '2rem' }}>
+              Access your Pro account, remove ads, and unlock premium tools.
             </p>
 
             <AdBanner slot="2169503342" />
 
-            {/* Google Sign-In */}
-            <div className="upload-box" style={{ marginTop: "1.5rem", textAlign: "center" }}>
-              <strong>Continue with Google</strong>
-              <p className="hint" style={{ marginTop: "0.35rem" }}>
-                Fast and secure — use your Google account to sign in.
-              </p>
-
-              <button
-                type="button"
-                className="primary-btn"
-                onClick={signInWithGoogle}
-                disabled={busy}
-                style={{ marginTop: "0.75rem", padding: "0.75rem 2rem" }}
-              >
-                {busy ? "Please wait…" : "Sign in with Google"}
-              </button>
-            </div>
+            {/* Google Login Button */}
+            <button
+              type="button"
+              onClick={signInWithGoogle}
+              disabled={busy}
+              style={{
+                width: '100%',
+                padding: '0.9rem',
+                fontSize: '1.1rem',
+                fontWeight: '500',
+                backgroundColor: '#ffffffff',
+                color: '#0c0000ff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: busy ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.75rem',
+                marginBottom: '1.5rem',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+              }}
+            >
+              <img
+                src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+                alt="Google"
+                style={{ height: '24px' }}
+              />
+              {busy ? "Signing in..." : "Sign in with Google"}
+            </button>
 
             {/* Divider */}
-            <div style={{ textAlign: "center", margin: "2rem 0", color: "#666" }}>
-              <span style={{ background: "#fff", padding: "0 1rem" }}>or</span>
-              <hr style={{ margin: "0.5rem 0", border: "none", borderTop: "1px solid #ddd" }} />
+            <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0', color: '#888' }}>
+              <div style={{ flex: 1, height: '1px', background: '#ddd' }} />
+              <span style={{ padding: '0 1.5rem', fontSize: '0.9rem' }}>or sign in with email</span>
+              <div style={{ flex: 1, height: '1px', background: '#ddd' }} />
             </div>
 
-            {/* Email Magic Link */}
-            <div className="upload-box" style={{ marginTop: "1rem" }}>
-              <strong>Sign in with Email</strong>
-              <p className="hint" style={{ marginTop: "0.35rem" }}>
-                We'll send you a secure magic link — no password needed.
-              </p>
+            {/* Email & Password Form */}
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ marginBottom: '1.2rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: '500' }}>Email address</label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="text-input"
+                  style={{ width: '100%', padding: '0.8rem' }}
+                  disabled={busy}
+                />
+              </div>
 
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="text-input"
-                style={{ width: "100%", marginTop: "0.75rem" }}
-                disabled={busy}
-              />
+              <div style={{ marginBottom: '0.8rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: '500' }}>Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="text-input"
+                  style={{ width: '100%', padding: '0.8rem' }}
+                  disabled={busy}
+                />
+              </div>
+
+              <div style={{ textAlign: 'right', marginBottom: '1.5rem' }}>
+                <Link href="/forgot-password" style={{ color: '#0070f3', fontSize: '0.9rem', textDecoration: 'none' }}>
+                  Forgot password?
+                </Link>
+              </div>
 
               <button
                 type="button"
+                onClick={handleLogin}
+                disabled={busy || !email.trim() || !password.trim()}
                 className="primary-btn"
-                onClick={sendMagicLink}
-                disabled={busy || !email}
-                style={{ marginTop: "0.75rem", width: "100%" }}
+                style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}
               >
-                {busy ? "Sending…" : "Send Magic Link"}
+                {busy ? "Signing in..." : "Sign in"}
               </button>
-
-              {sent && (
-                <p className="hint" style={{ marginTop: "0.75rem", color: "#28a745" }}>
-                  ✅ Magic link sent! Check your inbox (and spam folder).
-                </p>
-              )}
             </div>
 
-            {/* Error Display */}
+            {/* Error Message */}
             {error && (
-              <div className="upload-box" style={{ marginTop: "1.5rem", background: "#fff0f0" }}>
-                <strong style={{ color: "#d63031" }}>Error</strong>
-                <p className="hint" style={{ marginTop: "0.35rem", color: "#d63031" }}>
-                  {error}
-                </p>
-              </div>
+              <p style={{ color: '#d32f2f', marginTop: '1rem', fontSize: '0.95rem' }}>
+                {error}
+              </p>
             )}
+
+            {/* Create Account Link */}
+            <p style={{ marginTop: '2rem', fontSize: '1rem', color: '#444' }}>
+              Don't have an account?{' '}
+              <Link href="/signup" style={{ color: '#0070f3', fontWeight: '500' }}>
+                Create an account
+              </Link>
+            </p>
 
             <AdBanner slot="8164173850" />
           </section>

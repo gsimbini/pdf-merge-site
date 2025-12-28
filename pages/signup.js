@@ -3,23 +3,17 @@
 // pages/signup.js
 import Head from 'next/head';
 import Link from 'next/link';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getSupabase } from "../lib/supabaseClient";
 import ProBadge from "../components/ProBadge";
 import AdBanner from "../components/AdBanner";
 
 export default function SignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-
-  // Pre-fill email from localStorage if available (e.g., from previous visit)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const saved = localStorage.getItem("simbapdf_email") || "";
-    if (saved) setEmail(saved);
-  }, []);
 
   // Google Sign-Up
   async function signUpWithGoogle() {
@@ -49,13 +43,20 @@ export default function SignupPage() {
     }
   }
 
-  // Email Magic Link Sign-Up (creates account if new)
-  async function sendMagicLink() {
+  // Email + Password Sign-Up
+  async function handleSignup() {
     setError("");
-    setSent(false);
 
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+    if (!name.trim()) {
+      setError("Please enter your name.");
+      return;
+    }
+    if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) {
       setError("Please enter a valid email address.");
+      return;
+    }
+    if (!password.trim() || password.length < 6) {
+      setError("Password must be at least 6 characters.");
       return;
     }
 
@@ -69,28 +70,21 @@ export default function SignupPage() {
         return;
       }
 
-      // signUp creates a new user if email doesn't exist
       const { error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
+        password: password.trim(),
         options: {
+          data: { full_name: name.trim() }, // Store name in user metadata
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
-      if (error) {
-        // If user already exists, Supabase returns an error — treat as "check email"
-        if (error.message.includes("already registered")) {
-          setSent(true);
-          setMessage("Account already exists — check your email for a magic link to sign in.");
-        } else {
-          throw error;
-        }
-      } else {
-        setSent(true);
-        localStorage.setItem("simbapdf_email", email.trim().toLowerCase());
-      }
+      if (error) throw error;
+
+      // Success - redirect to account or show confirmation
+      window.location.href = "/account";
     } catch (e) {
-      setError(e?.message || "Failed to send sign-up link. Please try again.");
+      setError(e?.message || "Sign-up failed. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -100,7 +94,7 @@ export default function SignupPage() {
     <>
       <Head>
         <title>Create Account - SimbaPDF</title>
-        <meta name="description" content="Create a free SimbaPDF account with Google or email. Unlock Pro features and sync across devices." />
+        <meta name="description" content="Create a free SimbaPDF account with Google or email and password." />
       </Head>
 
       <div className="page">
@@ -125,84 +119,122 @@ export default function SignupPage() {
         </header>
 
         <main className="main">
-          <section className="tool-section">
-            <h2>Create Your Free Account</h2>
-            <p className="hint">
-              Sign up to remove ads, unlock Pro tools, and sync your experience across devices.
+          <section className="tool-section" style={{ maxWidth: '420px', margin: '0 auto', textAlign: 'center' }}>
+            <h2 style={{ marginBottom: '0.5rem' }}>Create Your Free Account</h2>
+            <p style={{ color: '#666', marginBottom: '2rem' }}>
+              Join SimbaPDF to unlock Pro features, remove ads, and save your work across devices.
             </p>
 
             <AdBanner slot="2169503342" />
 
-            {/* Google Sign-Up */}
-            <div className="upload-box" style={{ marginTop: "1.5rem", textAlign: "center" }}>
-              <strong>Sign up with Google</strong>
-              <p className="hint" style={{ marginTop: "0.35rem" }}>
-                Fast, secure, and one-click — perfect for getting started.
-              </p>
-
-              <button
-                type="button"
-                className="primary-btn"
-                onClick={signUpWithGoogle}
-                disabled={busy}
-                style={{ marginTop: "0.75rem", padding: "0.75rem 2rem" }}
-              >
-                {busy ? "Please wait…" : "Sign up with Google"}
-              </button>
-            </div>
+            {/* Google Sign-Up Button */}
+            <button
+              type="button"
+              onClick={signUpWithGoogle}
+              disabled={busy}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                fontSize: '1.1rem',
+                fontWeight: '500',
+                backgroundColor: '#ffffffff',
+                color: '#0c0000ff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: busy ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.75rem',
+                marginBottom: '1.5rem',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+              }}
+            >
+              <img
+                src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+                alt="Google"
+                style={{ height: '24px' }}
+              />
+              {busy ? "Creating account..." : "Sign up with Google"}
+            </button>
 
             {/* Divider */}
-            <div style={{ textAlign: "center", margin: "2rem 0", color: "#666" }}>
-              <span style={{ background: "#fff", padding: "0 1rem" }}>or</span>
-              <hr style={{ margin: "0.5rem 0", border: "none", borderTop: "1px solid #ddd" }} />
+            <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0', color: '#888' }}>
+              <div style={{ flex: 1, height: '1px', background: '#ddd' }} />
+              <span style={{ padding: '0 1.5rem', fontSize: '0.9rem' }}>or sign up with email</span>
+              <div style={{ flex: 1, height: '1px', background: '#ddd' }} />
             </div>
 
-            {/* Email Sign-Up */}
-            <div className="upload-box" style={{ marginTop: "1rem" }}>
-              <strong>Sign up with Email</strong>
-              <p className="hint" style={{ marginTop: "0.35rem" }}>
-                No password needed — we’ll send you a secure magic link.
-              </p>
+            {/* Form */}
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ marginBottom: '1.2rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: '500' }}>Full Name</label>
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="text-input"
+                  style={{ width: '100%', padding: '0.8rem' }}
+                  disabled={busy}
+                />
+              </div>
 
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="text-input"
-                style={{ width: "100%", marginTop: "0.75rem" }}
-                disabled={busy}
-              />
+              <div style={{ marginBottom: '1.2rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: '500' }}>Email address</label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="text-input"
+                  style={{ width: '100%', padding: '0.8rem' }}
+                  disabled={busy}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.2rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.4rem', fontWeight: '500' }}>Password</label>
+                <input
+                  type="password"
+                  placeholder="Create a strong password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="text-input"
+                  style={{ width: '100%', padding: '0.8rem' }}
+                  disabled={busy}
+                />
+              </div>
 
               <button
                 type="button"
+                onClick={handleSignup}
+                disabled={busy || !name.trim() || !email.trim() || !password.trim()}
                 className="primary-btn"
-                onClick={sendMagicLink}
-                disabled={busy || !email}
-                style={{ marginTop: "0.75rem", width: "100%" }}
+                style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}
               >
-                {busy ? "Sending…" : "Send Magic Link"}
+                {busy ? "Creating account..." : "Sign up"}
               </button>
 
-              {sent && (
-                <p className="hint" style={{ marginTop: "0.75rem", color: "#28a745" }}>
-                  ✅ Magic link sent! Check your inbox (and spam folder). If you already have an account, you can sign in with the same link.
+              <p style={{ marginTop: '1.5rem', fontSize: '0.95rem', color: '#666' }}>
+                By creating an account, you agree to SimbaPDF's{' '}
+                <Link href="/terms" style={{ color: '#0070f3' }}>Terms of Service</Link> and{' '}
+                <Link href="/privacy" style={{ color: '#0070f3' }}>Privacy Policy</Link>
+              </p>
+
+              {error && (
+                <p style={{ color: '#d63031', marginTop: '1rem', fontSize: '0.95rem' }}>
+                  {error}
                 </p>
               )}
             </div>
 
-            {/* Error Display */}
-            {error && (
-              <div className="upload-box" style={{ marginTop: "1.5rem", background: "#fff0f0" }}>
-                <strong style={{ color: "#d63031" }}>Error</strong>
-                <p className="hint" style={{ marginTop: "0.35rem", color: "#d63031" }}>
-                  {error}
-                </p>
-              </div>
-            )}
-
-            <p style={{ marginTop: "2rem", textAlign: "center" }}>
-              Already have an account? <Link href="/login" style={{ color: "#0070f3" }}>Sign in here</Link>
+            {/* Sign In Link */}
+            <p style={{ marginTop: '2rem', fontSize: '1rem', color: '#444' }}>
+              Already a member?{' '}
+              <Link href="/login" style={{ color: '#0070f3', fontWeight: '500' }}>
+                Sign in here
+              </Link>
             </p>
 
             <AdBanner slot="8164173850" />

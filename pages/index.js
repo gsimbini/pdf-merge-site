@@ -81,6 +81,7 @@ export default function HomePage() {
 
   const popularTools = [
     { href: '/cv-builder', title: 'Create CV / Resume', description: 'Build a professional resume with multiple templates – export as PDF in your browser.' },
+    { href: '/event-invitation-poster', title: 'Event Invitation / Poster', description: 'Design wedding invites, party cards & event posters – download PDF instantly.' },
     { href: '/merge-pdf', title: 'Merge PDF', description: 'Combine multiple PDFs into a single document.' },
     { href: '/pdf-to-pdfa', title: 'PDF to PDF/A (basic)', description: 'Create a simple archival-style copy of a PDF (browser-only, not strict validator-grade).' },
     { href: '/split-pdf', title: 'Split PDF', description: 'Extract selected pages or ranges into a new PDF.' },

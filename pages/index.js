@@ -121,6 +121,7 @@ export default function HomePage() {
     { href: '/excel-to-pdf', title: 'Excel to PDF (text)', description: 'Turn an Excel or CSV file into a text-based PDF.' },
     { href: '/ocr-to-pdf', title: 'OCR to PDF (searchable)', description: 'Run OCR on a scanned PDF and create a searchable PDF.' },
     { href: '/html-to-pdf', title: 'HTML to PDF', description: 'Paste simple HTML, preview it and download as a PDF.' },
+    { href: '/invoice', title: 'Invoice & Statement Generator', description: 'Create professional invoices and statements online – fill details, preview, and download as PDF.' },
   ];
 
   const filterTools = (tools) =>
@@ -165,6 +166,7 @@ export default function HomePage() {
           <nav className="nav">
             <Link href="/">Home</Link>
             <Link href="/pricing">Pricing</Link>
+            <Link href="/invoice">Invoice Generator</Link>
             <Link href="/login">Login</Link>
             <Link href="/account">Account</Link>
           </nav>

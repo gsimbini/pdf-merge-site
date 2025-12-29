@@ -11,14 +11,14 @@ export default function PricingPage() {
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Load last email used (helps users)
+  // Load last email used
   useEffect(() => {
     if (typeof window === "undefined") return;
     const saved = localStorage.getItem("simbapdf_email") || "";
     if (saved) setEmail(saved);
   }, []);
 
-  // Persist email so ads + pro status can be checked on all pages
+  // Persist email
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (email) localStorage.setItem("simbapdf_email", email.trim().toLowerCase());
@@ -71,37 +71,54 @@ export default function PricingPage() {
   }
 
   const plans = useMemo(() => {
-    const proMonthly = 49;
-    const proYearly = 490;
+    const monthlyPrice = 49;
+    const yearlyPrice = 490;
+    const annualEquivalent = Math.round(yearlyPrice / 12);
+    const savingsPercent = Math.round(((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12)) * 100);
 
     return [
       {
         name: "Free",
         price: 0,
+        period: "Forever",
         tagline: "Perfect for occasional use",
         features: [
-          "All basic PDF tools",
-          "Works in your browser",
-          "No signup required",
-          "Ads supported",
+          "All core PDF tools – merge, split, compress, and more",
+          "100% browser-based – no downloads or installs",
+          "No signup or login required",
+          "Supported by non-intrusive ads",
+          "Standard file size & processing speed",
         ],
+        cta: "Start Using Free Tools",
+        href: "/",
         highlight: false,
+        popular: false,
       },
       {
         name: "Pro",
-        price: billing === "monthly" ? proMonthly : proYearly,
-        tagline: "For daily work and faster flow",
+        price: billing === "monthly" ? monthlyPrice : yearlyPrice,
+        period: billing === "monthly" ? "per month" : `per year (R${annualEquivalent}/mo)`,
+        tagline:
+          billing === "monthly"
+            ? "Full power with flexible billing"
+            : `Best value – Save ${savingsPercent}%`,
         features: [
-          "Remove ads",
-          "Priority processing (where applicable)",
-          "Bigger file limits (coming soon)",
-          "Early access to new tools",
-          "Priority support",
+          "Remove all ads – clean, distraction-free experience",
+          "Priority & faster processing speeds",
+          "Higher file size limits (coming soon)",
+          "Unlimited tasks & larger uploads",
+          "Early access to new tools & features",
+          "Priority email support",
+          "Works seamlessly on mobile & desktop browsers",
         ],
+        cta: "Upgrade to Pro",
         highlight: true,
+        popular: billing === "yearly",
       },
     ];
   }, [billing]);
+
+  const selectedPlan = billing;
 
   return (
     <>
@@ -109,7 +126,7 @@ export default function PricingPage() {
         <title>Pricing - SimbaPDF</title>
         <meta
           name="description"
-          content="SimbaPDF pricing: Free tools supported by ads, and Pro to remove ads and unlock premium benefits."
+          content="SimbaPDF pricing: Powerful free PDF tools with ads, or upgrade to Pro for ad-free, faster, unlimited experience."
         />
       </Head>
 
@@ -126,11 +143,9 @@ export default function PricingPage() {
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <nav className="nav">
               <Link href="/">Home</Link>
-              <Link href="/merge-pdf">Merge PDF</Link>
-              <Link href="/compress-pdf">Compress PDF</Link>
-              <Link href="/split-pdf">Split PDF</Link>
               <Link href="/pricing">Pricing</Link>
               <Link href="/account">Account</Link>
+              <Link href="/login">Login</Link>
             </nav>
 
             <ProBadge />
@@ -139,153 +154,164 @@ export default function PricingPage() {
 
         <main className="main">
           <section className="tool-section">
-            <h2>Pricing</h2>
-            <p>
-              SimbaPDF is free to use. Ads help pay for servers and development.
-              If you want a cleaner experience, go Pro.
-            </p>
-
-            {/* ✅ Magic Link Login block */}
-            <div style={{ marginTop: "1rem" }}>
-              <MagicLinkLogin />
-            </div>
-
-            <AdBanner slot="9740145252" />
-
-            {/* Email for activation */}
-            <div className="upload-box" style={{ marginTop: "1rem" }}>
-              <strong>Pro activation email</strong>
-              <p className="hint" style={{ marginTop: "0.35rem" }}>
-                Enter the email that will be activated after PayFast confirms
-                payment (ITN COMPLETE).
-              </p>
-
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.75rem",
-                  borderRadius: "10px",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  background: "rgba(255,255,255,0.03)",
-                  color: "inherit",
-                  marginTop: "0.75rem",
-                }}
-              />
-            </div>
-
-            {/* Billing toggle */}
-            <div className="pricing-toggle" style={{ marginTop: "1rem" }}>
+            
+            {/* Billing toggle – inspired by iLovePDF/Smallpdf */}
+            <div
+              className="pricing-toggle"
+              style={{
+                display: "inline-flex",
+                background: "rgba(6, 163, 13, 0.71)",
+                borderRadius: "50px",
+                padding: "0.35rem",
+                margin: "2rem auto",
+                display: "block",
+                width: "fit-content",
+              }}
+            >
               <button
-                type="button"
-                className={billing === "monthly" ? "toggle-btn active" : "toggle-btn"}
+                className={`toggle-btn ${billing === "monthly" ? "active" : ""}`}
                 onClick={() => setBilling("monthly")}
                 disabled={busy}
               >
                 Monthly
               </button>
               <button
-                type="button"
-                className={billing === "yearly" ? "toggle-btn active" : "toggle-btn"}
+                className={`toggle-btn ${billing === "yearly" ? "active" : ""}`}
                 onClick={() => setBilling("yearly")}
                 disabled={busy}
               >
-                Yearly (save)
-              </button>
-            </div>
-
-            {/* Quick PayFast buttons */}
-            <div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-              <button
-                className="primary-btn"
-                type="button"
-                onClick={() => goPayFast("monthly")}
-                disabled={busy}
-              >
-                {busy ? "Starting checkout…" : "Go Pro – Monthly (PayFast)"}
-              </button>
-
-              <button
-                className="primary-btn"
-                type="button"
-                onClick={() => goPayFast("yearly")}
-                disabled={busy}
-              >
-                {busy ? "Starting checkout…" : "Go Pro – Yearly (PayFast)"}
-              </button>
-            </div>
-
-            {/* Pricing cards */}
-            <div className="pricing-grid" style={{ marginTop: "1rem" }}>
-              {plans.map((p) => (
-                <div
-                  key={p.name}
-                  className={p.highlight ? "pricing-card highlight" : "pricing-card"}
+                Yearly{" "}
+                <span
+                  style={{
+                    background: "#4caf50",
+                    color: "white",
+                    fontSize: "0.75rem",
+                    padding: "0.15rem 0.5rem",
+                    borderRadius: "10px",
+                    marginLeft: "0.4rem",
+                  }}
                 >
-                  <div>
-                    <h3 style={{ marginBottom: "0.25rem" }}>{p.name}</h3>
-                    <p className="hint" style={{ marginTop: 0 }}>
-                      {p.tagline}
-                    </p>
+                  Save {Math.round(((49 * 12 - 490) / (49 * 12)) * 100)}%
+                </span>
+              </button>
+            </div>
 
-                    <div className="price">
-                      <span className="amount">
-                        {p.name === "Free" ? "R0" : billing === "monthly" ? "R49" : "R490"}
-                      </span>
-                      <span className="period">
-                        {p.name === "Free"
-                          ? "/ forever"
-                          : billing === "monthly"
-                          ? "/ month"
-                          : "/ year"}
-                      </span>
+            {/* Pricing grid – 2 columns, responsive */}
+            <div
+              className="pricing-grid"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                gap: "2rem",
+                maxWidth: "900px",
+                margin: "0 auto",
+              }}
+            >
+              {plans.map((plan) => (
+                <div
+                  key={plan.name}
+                  className={`pricing-card ${plan.highlight ? "highlight" : ""} ${plan.popular ? "popular" : ""}`}
+                  style={{
+                    position: "relative",
+                    background: plan.highlight ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.05)",
+                    border: plan.highlight ? "2px solid #4caf50" : "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "16px",
+                    padding: "2rem 1.5rem",
+                    textAlign: "center",
+                    boxShadow: plan.popular ? "0 10px 30px rgba(76,175,80,0.2)" : "none",
+                  }}
+                >
+                  {plan.popular && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "-12px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        background: "#4caf50",
+                        color: "white",
+                        padding: "0.35rem 1rem",
+                        borderRadius: "20px",
+                        fontSize: "0.85rem",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Most Popular
                     </div>
+                  )}
 
-                    <ul className="feature-list">
-                      {p.features.map((f) => (
-                        <li key={f}>✓ {f}</li>
-                      ))}
-                    </ul>
+                  <h3 style={{ margin: "0 0 0.5rem" }}>{plan.name}</h3>
+                  <p className="tagline" style={{ margin: "0 0 1.5rem", opacity: 0.8 }}>
+                    {plan.tagline}
+                  </p>
+
+                  <div className="price" style={{ marginBottom: "1.5rem" }}>
+                    <span style={{ fontSize: "3rem", fontWeight: "bold" }}>
+                      {plan.price === 0 ? "R0" : `R${plan.price}`}
+                    </span>
+                    <span style={{ fontSize: "1.1rem", opacity: 0.8 }}>
+                      {" "}{plan.period}
+                    </span>
                   </div>
 
-                  {p.name === "Free" ? (
-                    <Link className="primary-btn" href="/">
-                      Use Free Tools
+                  <ul className="feature-list" style={{ listStyle: "none", padding: 0, margin: "0 0 2rem", textAlign: "left" }}>
+                    {plan.features.map((f) => (
+                      <li key={f} style={{ margin: "0.85rem 0", fontSize: "1.05rem" }}>
+                        ✓ {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {plan.name === "Free" ? (
+                    <Link href={plan.href} className="primary-btn" style={{ display: "block", padding: "1rem", fontSize: "1.1rem" }}>
+                      {plan.cta}
                     </Link>
                   ) : (
                     <button
                       className="primary-btn"
-                      type="button"
-                      onClick={() => goPayFast(billing === "monthly" ? "monthly" : "yearly")}
+                      style={{ width: "100%", padding: "1rem", fontSize: "1.1rem" }}
+                      onClick={() => goPayFast(selectedPlan)}
                       disabled={busy}
                     >
-                      {billing === "monthly"
-                        ? "Go Pro – Monthly (PayFast)"
-                        : "Go Pro – Yearly (PayFast)"}
+                      {busy ? "Processing..." : plan.cta}
                     </button>
-                  )}
-
-                  {p.name === "Pro" && (
-                    <p className="hint" style={{ marginTop: "0.75rem" }}>
-                      Pro is activated only after PayFast ITN confirms <b>COMPLETE</b>.
-                    </p>
                   )}
                 </div>
               ))}
             </div>
 
-            <div className="upload-box" style={{ marginTop: "1.25rem" }}>
-              <strong>FAQ</strong>
-              <div style={{ marginTop: "0.5rem" }}>
-                <p className="hint" style={{ margin: "0.25rem 0" }}>
-                  <b>Does Pro remove ads?</b> Yes — that’s the main benefit.
-                </p>
-                <p className="hint" style={{ margin: "0.25rem 0" }}>
-                  <b>When is Pro activated?</b> Only after PayFast confirms payment via ITN (COMPLETE).
-                </p>
+            {/* Final CTA + email – lower friction */}
+            <div style={{ margin: "4rem auto 2rem", textAlign: "center", maxWidth: "500px" }}>
+              <h3>Ready to go Pro?</h3>
+              <p className="hint" style={{ marginBottom: "1rem" }}>
+                Login or signup and start a secure checkout via PayFast (South Africa's trusted payment gateway).
+              </p>
+
+              
+              <button
+                className="primary-btn large"
+                style={{ width: "100%", maxWidth: "400px", padding: "1.2rem", fontSize: "1.2rem" }}
+                onClick={() => goPayFast(selectedPlan)}
+                disabled={busy}
+              >
+                {busy ? "Starting secure checkout…" : `Go Pro – ${billing === "monthly" ? "Monthly" : "Yearly"} (PayFast)`}
+              </button>
+
+              <p className="hint" style={{ marginTop: "1rem", fontSize: "0.9rem" }}>
+                Secure payment • Pro activated automatically after PayFast confirmation (ITN COMPLETE)
+              </p>
+            </div>
+
+            <AdBanner slot="9740145252" style={{ margin: "3rem auto" }} />
+
+            {/* FAQ */}
+            <div className="upload-box" style={{ margin: "3rem auto", maxWidth: "700px" }}>
+              <strong>Frequently Asked Questions</strong>
+              <div style={{ marginTop: "1rem" }}>
+                <p><b>Does Pro remove ads?</b> Yes — completely ad-free experience.</p>
+                <p><b>What do I get with Pro?</b> Faster processing, higher limits (coming), priority support, early features, and no ads.</p>
+                <p><b>When is Pro activated?</b> Automatically after PayFast confirms payment (ITN COMPLETE).</p>
+                <p><b>Is payment secure?</b> Yes — processed securely via PayFast, South Africa's leading payment gateway.</p>
               </div>
             </div>
 
@@ -297,6 +323,42 @@ export default function PricingPage() {
           <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
         </footer>
       </div>
+
+      <style jsx>{`
+        .pricing-toggle button {
+          padding: 0.6rem 1.5rem;
+          border: none;
+          background: transparent;
+          color: white;
+          cursor: pointer;
+          border-radius: 50px;
+          font-weight: 500;
+        }
+        .pricing-toggle button.active {
+          background: white;
+          color: black;
+        }
+        .primary-btn {
+          background: #4caf50;
+          color: white;
+          border: none;
+          padding: 0.9rem 1.8rem;
+          border-radius: 12px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .primary-btn:hover {
+          background: #43a047;
+        }
+        .primary-btn.large {
+          font-size: 1.2rem;
+        }
+        .pricing-card.popular {
+          transform: scale(1.05);
+          z-index: 1;
+        }
+      `}</style>
     </>
   );
 }

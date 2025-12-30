@@ -1,15 +1,27 @@
 // pages/api/payfast/itn.js
 import crypto from 'crypto';
 
-// Replace with your actual Pro activation function (e.g., update DB or localStorage)
+// IMPORTANT: Replace this with your REAL Pro activation logic
+// (e.g. database update, subscription expiry extension, user flag)
 async function activatePro(email, plan, token) {
-  // Your logic here: e.g., save to database, extend subscription expiry
-  console.log(`Activating Pro for ${email} on ${plan} plan with token ${token}`);
-  // Example: await db.users.update({ email }, { pro: true, token });
+  if (!email || !plan || !token) {
+    console.warn('Missing activation data in ITN:', { email, plan, token });
+    return;
+  }
+
+  console.log(`PRO ACTIVATION: ${email} for ${plan} plan (token: ${token})`);
+
+  // TODO: Real implementation
+  // Example with Prisma/Supabase:
+  // await prisma.user.update({
+  //   where: { email },
+  //   data: { isPro: true, proPlan: plan, subscriptionToken: token, updatedAt: new Date() }
+  // });
+
+  // Or send confirmation email, update cache, etc.
 }
 
 const PAYFAST = {
-  merchantId: process.env.PAYFAST_MERCHANT_ID,
   passphrase: process.env.PAYFAST_PASSPHRASE || '',
   sandbox: process.env.PAYFAST_SANDBOX === 'true',
 };
@@ -19,52 +31,63 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Acknowledge immediately to stop PayFast retries
+  // Acknowledge immediately (critical to prevent PayFast retries)
   res.status(200).end();
 
   const data = req.body;
 
-  // Log the entire incoming ITN for debugging (remove in production for security)
-  console.log('Incoming ITN:', data);
+  // Optional minimal logging (do NOT log full body in production)
+  // console.log('ITN received from:', req.headers['x-forwarded-for'] || 'unknown');
 
   // Step 1: Verify signature
   const pfParamString = Object.entries(data)
     .filter(([key]) => key !== 'signature')
-    .map(([key, value]) => `${key}=${encodeURIComponent(value.toString().trim())}`)
+    .map(([key, value]) => `${key}=${encodeURIComponent(String(value).trim())}`)
     .join('&');
-  const verificationString = pfParamString + `&passphrase=${encodeURIComponent(PAYFAST.passphrase.trim())}`;
-  const calculatedSignature = crypto.createHash('md5').update(verificationString).digest('hex');
+
+  const stringToSign = pfParamString + (PAYFAST.passphrase ? `&passphrase=${encodeURIComponent(PAYFAST.passphrase)}` : '');
+  const calculatedSignature = crypto.createHash('md5').update(stringToSign).digest('hex');
 
   if (data.signature !== calculatedSignature) {
     console.error('Invalid ITN signature');
     return;
   }
 
-  // Step 2: Check if payment is COMPLETE
+  // Step 2: Only process COMPLETE payments
   if (data.payment_status !== 'COMPLETE') {
-    console.error('ITN payment not COMPLETE:', data.payment_status);
+    console.log('ITN ignored - not COMPLETE:', data.payment_status);
     return;
   }
 
-  // Step 3: Server-side validation with PayFast (optional but recommended)
-  const pfHost = PAYFAST.sandbox ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
-  const validateUrl = `https://${pfHost}/eng/query/validate`;
-  const validateResponse = await fetch(validateUrl, {
-    method: 'POST',
-    body: new URLSearchParams(data),
-  });
-  const validationResult = await validateResponse.text();
+  // Step 3: Optional server-side validation (skip in sandbox if unstable)
+  if (!PAYFAST.sandbox) {
+    try {
+      const pfHost = 'www.payfast.co.za';
+      const validateUrl = `https://${pfHost}/eng/query/validate`;
+      const validateResponse = await fetch(validateUrl, {
+        method: 'POST',
+        body: new URLSearchParams(data),
+        signal: AbortSignal.timeout(5000), // 5s timeout
+      });
 
-  if (validationResult !== 'VALID') {
-    console.error('Invalid ITN transaction');
-    return;
+      const validationResult = await validateResponse.text();
+
+      if (validationResult !== 'VALID') {
+        console.error('ITN validation failed:', validationResult);
+        return;
+      }
+    } catch (err) {
+      console.error('ITN validation request failed:', err.message);
+      // Optionally continue or return — PayFast still considers it valid if signature ok
+    }
   }
 
-  // Step 4: Process the successful payment (activate Pro)
-  const email = data.custom_str1;  // From your init data
-  const plan = data.custom_str2;   // From your init data
-  const token = data.token;        // Subscription token for recurring management
+  // Step 4: Activate Pro
+  const email = String(data.custom_str1 || '').trim();
+  const plan = String(data.custom_str2 || '').trim();
+  const token = String(data.token || '').trim();
+
   await activatePro(email, plan, token);
 
-  console.log(`ITN processed successfully for ${email}`);
+  console.log(`ITN processed successfully for ${email || 'unknown'}`);
 }

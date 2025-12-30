@@ -10,6 +10,7 @@ export default function PricingPage() {
   const [billing, setBilling] = useState("monthly"); // "monthly" | "yearly"
   const [email, setEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [emailError, setEmailError] = useState(""); // new state for inline error
 
   // Load last email used
   useEffect(() => {
@@ -25,14 +26,18 @@ export default function PricingPage() {
   }, [email]);
 
   async function goPayFast(plan) {
+    // Clear previous error
+    setEmailError("");
+
+    // Validate email only when clicking the button
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      setEmailError("Please enter a valid email for Pro activation.");
+      return;
+    }
+
+    setBusy(true);
+
     try {
-      if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-        alert("Please enter a valid email for Pro activation.");
-        return;
-      }
-
-      setBusy(true);
-
       const res = await fetch("/api/payfast/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -154,8 +159,7 @@ export default function PricingPage() {
 
         <main className="main">
           <section className="tool-section">
-            
-            {/* Billing toggle – inspired by iLovePDF/Smallpdf */}
+            {/* Billing toggle */}
             <div
               className="pricing-toggle"
               style={{
@@ -172,6 +176,7 @@ export default function PricingPage() {
                 className={`toggle-btn ${billing === "monthly" ? "active" : ""}`}
                 onClick={() => setBilling("monthly")}
                 disabled={busy}
+                aria-pressed={billing === "monthly"}
               >
                 Monthly
               </button>
@@ -179,6 +184,7 @@ export default function PricingPage() {
                 className={`toggle-btn ${billing === "yearly" ? "active" : ""}`}
                 onClick={() => setBilling("yearly")}
                 disabled={busy}
+                aria-pressed={billing === "yearly"}
               >
                 Yearly{" "}
                 <span
@@ -196,7 +202,7 @@ export default function PricingPage() {
               </button>
             </div>
 
-            {/* Pricing grid – 2 columns, responsive */}
+            {/* Pricing grid */}
             <div
               className="pricing-grid"
               style={{
@@ -272,6 +278,7 @@ export default function PricingPage() {
                       style={{ width: "100%", padding: "1rem", fontSize: "1.1rem" }}
                       onClick={() => goPayFast(selectedPlan)}
                       disabled={busy}
+                      aria-busy={busy}
                     >
                       {busy ? "Processing..." : plan.cta}
                     </button>
@@ -280,19 +287,49 @@ export default function PricingPage() {
               ))}
             </div>
 
-            {/* Final CTA + email – lower friction */}
-            <div style={{ margin: "4rem auto 2rem", textAlign: "center", maxWidth: "500px" }}>
+            {/* Final CTA + EMAIL INPUT + button */}
+            <div style={{ margin: "4rem auto 2rem", textAlign: "center", maxWidth: "500px", position: "relative" }}>
               <h3>Ready to go Pro?</h3>
               <p className="hint" style={{ marginBottom: "1rem" }}>
-                Login or signup and start a secure checkout via PayFast (South Africa's trusted payment gateway).
+                Enter your email below to receive Pro activation and receipts via PayFast.
               </p>
 
-              
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value.trim());
+                  setEmailError(""); // clear error when typing
+                }}
+                style={{
+                  width: "100%",
+                  maxWidth: "400px",
+                  padding: "1rem",
+                  marginBottom: "0.5rem",
+                  borderRadius: "12px",
+                  border: emailError ? "1px solid #ff6b6b" : "1px solid rgba(255,255,255,0.3)",
+                  background: "rgba(255,255,255,0.08)",
+                  color: "black",
+                  fontSize: "1.1rem",
+                }}
+                disabled={busy}
+                aria-label="Activation email"
+                aria-invalid={!!emailError}
+              />
+
+              {emailError && (
+                <p style={{ color: "#ff6b6b", fontSize: "0.95rem", marginBottom: "1rem", textAlign: "left", maxWidth: "400px" }}>
+                  {emailError}
+                </p>
+              )}
+
               <button
                 className="primary-btn large"
                 style={{ width: "100%", maxWidth: "400px", padding: "1.2rem", fontSize: "1.2rem" }}
                 onClick={() => goPayFast(selectedPlan)}
                 disabled={busy}
+                aria-busy={busy}
               >
                 {busy ? "Starting secure checkout…" : `Go Pro – ${billing === "monthly" ? "Monthly" : "Yearly"} (PayFast)`}
               </button>
@@ -300,6 +337,23 @@ export default function PricingPage() {
               <p className="hint" style={{ marginTop: "1rem", fontSize: "0.9rem" }}>
                 Secure payment • Pro activated automatically after PayFast confirmation (ITN COMPLETE)
               </p>
+
+              {busy && (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "rgba(0,0,0,0.3)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "12px",
+                    zIndex: 10,
+                  }}
+                >
+                  <div style={{ color: "white", fontSize: "1.2rem" }}>Processing...</div>
+                </div>
+              )}
             </div>
 
             <AdBanner slot="9740145252" style={{ margin: "3rem auto" }} />

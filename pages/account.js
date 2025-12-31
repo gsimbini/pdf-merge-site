@@ -12,47 +12,83 @@ import AdBanner from "../components/AdBanner";
 export default function AccountPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [ready, setReady] = useState(false);
+  const [supabaseClient, setSupabaseClient] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
 
   const { isPro, loading: proLoading } = useProStatus();
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    const client = getSupabase();
+    setSupabaseClient(client);
+  }, []);
 
-    const supabase = getSupabase();
-    if (!supabase) {
-      setReady(true);
-      return;
-    }
+  useEffect(() => {
+    if (!supabaseClient) return;
 
-    // Initial session
-    supabase.auth.getSession().then(({ data }) => {
-      const e = data?.session?.user?.email?.toLowerCase() || "";
-      setEmail(e);
-      if (e) localStorage.setItem("simbapdf_email", e);
-      setReady(true);
-    });
+    const initializeAuth = async () => {
+      try {
+        setLoading(true);
+        setAuthError(null);
 
-    // Auth state listener
-    const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        const e = session?.user?.email?.toLowerCase() || "";
-        setEmail(e);
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        const userEmail = session?.user?.email?.toLowerCase() || "";
+        setEmail(userEmail);
 
-        if (e) {
-          localStorage.setItem("simbapdf_email", e);
+        if (userEmail) {
+          localStorage.setItem("simbapdf_email", userEmail);
         } else {
           localStorage.removeItem("simbapdf_email");
         }
+
+        const { data: subscription } = supabaseClient.auth.onAuthStateChange(
+          (_event, session) => {
+            const newEmail = session?.user?.email?.toLowerCase() || "";
+            setEmail(newEmail);
+            if (newEmail) {
+              localStorage.setItem("simbapdf_email", newEmail);
+            } else {
+              localStorage.removeItem("simbapdf_email");
+              router.push("/login");
+            }
+          }
+        );
+
+        return () => subscription?.subscription?.unsubscribe();
+      } catch (err) {
+        console.error("Auth error:", err);
+        setAuthError("Failed to load account. Please try again.");
+      } finally {
+        setLoading(false);
       }
-    );
-
-    return () => {
-      subscription?.subscription?.unsubscribe();
     };
-  }, []);
 
-  if (!ready) return null;
+    initializeAuth();
+  }, [supabaseClient, router]);
+
+  if (loading) {
+    return (
+      <div className="page">
+        <div style={{ padding: "6rem 1rem", textAlign: "center" }}>
+          <p>Loading your account...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (authError) {
+    return (
+      <div className="page">
+        <div style={{ padding: "6rem 1rem", textAlign: "center" }}>
+          <h2 style={{ color: "#f44336" }}>Error</h2>
+          <p>{authError}</p>
+          <Link href="/login" className="primary-btn" style={{ marginTop: "1.5rem" }}>
+            Back to Login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!email) {
     return (
@@ -60,7 +96,6 @@ export default function AccountPage() {
         <Head>
           <title>Account - SimbaPDF</title>
         </Head>
-
         <div className="page">
           <header className="header">
             <div className="brand">
@@ -70,7 +105,6 @@ export default function AccountPage() {
                 <p className="tagline">Account</p>
               </div>
             </div>
-
             <nav className="nav">
               <Link href="/">Home</Link>
               <Link href="/pricing">Pricing</Link>
@@ -81,15 +115,18 @@ export default function AccountPage() {
           <main className="main">
             <section className="tool-section">
               <h2>You’re not signed in</h2>
-              <p className="hint">
-                Please log in to view your account and subscription status.
+              <p className="hint" style={{ margin: "1rem 0 1.5rem" }}>
+                Sign in to view and manage your SimbaPDF account, subscription, and settings.
               </p>
-
               <Link className="primary-btn" href="/login">
-                Go to Login
+                Sign In
               </Link>
             </section>
           </main>
+
+          <footer className="footer">
+            <p>© {new Date().getFullYear()} SimbaPDF. All rights reserved.</p>
+          </footer>
         </div>
       </>
     );
@@ -98,7 +135,7 @@ export default function AccountPage() {
   return (
     <>
       <Head>
-        <title>Account - SimbaPDF</title>
+        <title>My Account - SimbaPDF</title>
       </Head>
 
       <div className="page">
@@ -111,11 +148,13 @@ export default function AccountPage() {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
             <nav className="nav">
               <Link href="/">Home</Link>
               <Link href="/pricing">Pricing</Link>
-              <Link href="/account">Account</Link>
+              <Link href="/account" style={{ fontWeight: "bold" }}>
+                Account
+              </Link>
             </nav>
             <ProBadge />
           </div>
@@ -123,37 +162,81 @@ export default function AccountPage() {
 
         <main className="main">
           <section className="tool-section">
-            <h2>Account</h2>
+            <h2>My Account</h2>
+            <p className="hint" style={{ marginBottom: "2rem" }}>
+              Manage your profile, subscription and preferences.
+            </p>
 
-            <div className="upload-box">
+            <div className="upload-box" style={{ marginBottom: "1.5rem" }}>
               <strong>Email</strong>
-              <p className="hint" style={{ marginTop: "0.35rem" }}>
+              <p className="hint" style={{ marginTop: "0.5rem", fontSize: "1.1rem" }}>
                 {email}
               </p>
             </div>
 
-            <div className="upload-box" style={{ marginTop: "1rem" }}>
-              <strong>Subscription</strong>
-              <p className="hint" style={{ marginTop: "0.35rem" }}>
+            <div className="upload-box" style={{ marginBottom: "1.5rem" }}>
+              <strong>Subscription Status</strong>
+              <p 
+                className="hint" 
+                style={{ 
+                  marginTop: "0.5rem", 
+                  fontSize: "1.1rem",
+                  color: proLoading ? "#666" : isPro ? "#2e7d32" : "#e65100",
+                  fontWeight: "500"
+                }}
+              >
                 {proLoading
-                  ? "Checking status…"
+                  ? "Checking..."
                   : isPro
-                  ? "✅ Pro Active"
-                  : "Free plan (ads enabled)"}
+                  ? "Pro Plan Active ✓"
+                  : "Free Plan (with ads)"}
               </p>
 
-              {!isPro && (
-                <Link className="primary-btn" href="/pricing" style={{ marginTop: "0.75rem" }}>
+              {!isPro && !proLoading && (
+                <Link 
+                  className="primary-btn" 
+                  href="/pricing" 
+                  style={{ marginTop: "1rem", display: "inline-block" }}
+                >
                   Upgrade to Pro
+                </Link>
+              )}
+
+              {isPro && !proLoading && (
+                <Link 
+                  href="/pricing" 
+                  style={{ 
+                    marginTop: "1rem", 
+                    display: "inline-block",
+                    color: "#1976d2",
+                    textDecoration: "underline"
+                  }}
+                >
+                  Manage Plan
                 </Link>
               )}
             </div>
 
-            <div style={{ marginTop: "1rem" }}>
+            <div style={{ marginTop: "2rem" }}>
               <LogoutButton />
             </div>
 
-            <AdBanner slot="8164173850" />
+            {/* Optional future sections – placeholder style matching tool-section */}
+            <div 
+              className="upload-box" 
+              style={{ 
+                marginTop: "2.5rem", 
+                backgroundColor: "#f9f9f9", 
+                borderStyle: "dashed" 
+              }}
+            >
+              <strong>Recent Files</strong>
+              <p className="hint" style={{ marginTop: "0.75rem" }}>
+                Your recently processed files will appear here soon.
+              </p>
+            </div>
+
+            <AdBanner slot="8164173850" style={{ marginTop: "2rem" }} />
           </section>
         </main>
 

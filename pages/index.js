@@ -60,22 +60,19 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    fetch('https://zenquotes.io/api/today')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data[0]) {
-          setQuote(data[0]);
-        } else {
-          setQuote({ q: "Keep going — every small step counts.", a: "SimbaPDF" });
-        }
-      })
-      .catch(() => {
-        setQuote({ q: "Success is built one PDF at a time.", a: "SimbaPDF" });
-      })
-      .finally(() => {
-        setQuoteLoading(false);
-      });
-  }, []);
+  setQuoteLoading(true);
+
+  fetch('/api/daily-quote')
+    .then(res => res.json())
+    .then(data => {
+      setQuote(data);
+    })
+    .catch(err => {
+      console.error(err);
+      setQuote({ q: "Success is built one PDF at a time.", a: "SimbaPDF" });
+    })
+    .finally(() => setQuoteLoading(false));
+}, []);
 
   const q = search.trim().toLowerCase();
 

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useState } from "react";
 import { getSupabase } from "../lib/supabaseClient";
 import ProBadge from "../components/ProBadge";
-import AdBanner from "../components/AdBanner";
+
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -125,7 +125,7 @@ export default function SignupPage() {
               Join SimbaPDF to unlock Pro features, remove ads, and save your work across devices.
             </p>
 
-            <AdBanner slot="2169503342" />
+            
 
             {/* Google Sign-Up Button */}
             <button
@@ -237,7 +237,7 @@ export default function SignupPage() {
               </Link>
             </p>
 
-            <AdBanner slot="8164173850" />
+            
           </section>
         </main>
 

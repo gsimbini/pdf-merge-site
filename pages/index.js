@@ -51,7 +51,6 @@ export default function HomePage() {
     script.innerHTML = JSON.stringify(config);
     tickerRef.current.appendChild(script);
 
-    // Cleanup
     return () => {
       if (tickerRef.current) {
         tickerRef.current.innerHTML = '';
@@ -60,30 +59,25 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-  const controller = new AbortController();
+    const controller = new AbortController();
 
-  setQuoteLoading(true);
+    setQuoteLoading(true);
 
-  fetch("/api/daily-quote?ts=" + Date.now(), {
-    cache: "no-store",
-    signal: controller.signal,
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      setQuote(data);
+    fetch("/api/daily-quote?ts=" + Date.now(), {
+      cache: "no-store",
+      signal: controller.signal,
     })
-    .catch((err) => {
-      // Ignore abort errors
-      if (err?.name === "AbortError") return;
+      .then((res) => res.json())
+      .then((data) => setQuote(data))
+      .catch((err) => {
+        if (err?.name === "AbortError") return;
+        console.error(err);
+        setQuote({ q: "Success is built one PDF at a time.", a: "SimbaPDF" });
+      })
+      .finally(() => setQuoteLoading(false));
 
-      console.error(err);
-      setQuote({ q: "Success is built one PDF at a time.", a: "SimbaPDF" });
-    })
-    .finally(() => setQuoteLoading(false));
-
-  return () => controller.abort();
-}, []);
-
+    return () => controller.abort();
+  }, []);
 
   const q = search.trim().toLowerCase();
 
@@ -211,27 +205,27 @@ export default function HomePage() {
             </div>
           </section>
 
-          {/* TradingView Ticker Tape – continuous scrolling bar */}
-          <section 
-            className="tool-section" 
-            style={{ 
-              padding: '0', 
-              margin: '2rem 0', 
-              background: '#050000ff', 
+          {/* TradingView Ticker Tape */}
+          <section
+            className="tool-section"
+            style={{
+              padding: '0',
+              margin: '2rem 0',
+              background: '#050000ff',
               overflow: 'hidden',
               height: '70px'
             }}
           >
-            <div 
+            <div
               ref={tickerRef}
-              className="tradingview-widget-container" 
+              className="tradingview-widget-container"
               style={{ height: '100%', width: '100%' }}
             >
               <div className="tradingview-widget-container__widget"></div>
               <div className="tradingview-widget-copyright">
-                <a 
-                  href="https://www.tradingview.com/" 
-                  rel="noopener nofollow" 
+                <a
+                  href="https://www.tradingview.com/"
+                  rel="noopener nofollow"
                   target="_blank"
                 >
                   <span className="blue-text">Track all markets on TradingView</span>
@@ -264,6 +258,7 @@ export default function HomePage() {
             )}
           </section>
 
+          {/* ✅ Ad block 1 (homepage only; AdBanner guards route too) */}
           <section className="tool-section">
             <AdBanner slot="9740145252" />
           </section>
@@ -291,8 +286,9 @@ export default function HomePage() {
             </section>
           )}
 
+          {/* ✅ Ad block 2 (use a real slot; your previous <AdBanner /> had no slot) */}
           <section className="tool-section">
-            <AdBanner />
+            <AdBanner slot="8164173850" />
           </section>
 
           {filteredEdit.length > 0 && (
@@ -360,8 +356,6 @@ export default function HomePage() {
               storing user files on a server.
             </p>
           </section>
-
-          <AdBanner slot="8164173850" />
         </main>
 
         <footer className="footer">

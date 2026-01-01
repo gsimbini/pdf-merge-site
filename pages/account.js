@@ -7,7 +7,7 @@ import { getSupabase } from "../lib/supabaseClient";
 import useProStatus from "../components/useProStatus";
 import LogoutButton from "../components/LogoutButton";
 import ProBadge from "../components/ProBadge";
-import AdBanner from "../components/AdBanner";
+
 
 export default function AccountPage() {
   const router = useRouter();
@@ -236,7 +236,7 @@ export default function AccountPage() {
               </p>
             </div>
 
-            <AdBanner slot="8164173850" style={{ marginTop: "2rem" }} />
+            
           </section>
         </main>
 

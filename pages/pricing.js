@@ -2,7 +2,6 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
-import AdBanner from "../components/AdBanner";
 import ProBadge from "../components/ProBadge";
 import MagicLinkLogin from "../components/MagicLinkLogin";
 
@@ -356,8 +355,7 @@ export default function PricingPage() {
               )}
             </div>
 
-            <AdBanner slot="9740145252" style={{ margin: "3rem auto" }} />
-
+            
             {/* FAQ */}
             <div className="upload-box" style={{ margin: "3rem auto", maxWidth: "700px" }}>
               <strong>Frequently Asked Questions</strong>
@@ -369,8 +367,7 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <AdBanner slot="8164173850" />
-          </section>
+            </section>
         </main>
 
         <footer className="footer">

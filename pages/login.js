@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useState } from "react";
 import { getSupabase } from "../lib/supabaseClient";
 import ProBadge from "../components/ProBadge";
-import AdBanner from "../components/AdBanner";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -112,8 +112,7 @@ export default function LoginPage() {
               Access your Pro account, remove ads, and unlock premium tools.
             </p>
 
-            <AdBanner slot="2169503342" />
-
+            
             {/* Google Login Button */}
             <button
               type="button"
@@ -212,8 +211,7 @@ export default function LoginPage() {
               </Link>
             </p>
 
-            <AdBanner slot="8164173850" />
-          </section>
+              </section>
         </main>
 
         <footer className="footer">

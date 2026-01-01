@@ -8,53 +8,56 @@ import useProStatus from "../components/useProStatus";
 import LogoutButton from "../components/LogoutButton";
 import ProBadge from "../components/ProBadge";
 
-
 export default function AccountPage() {
   const router = useRouter();
+
   const [email, setEmail] = useState("");
-  const [supabaseClient, setSupabaseClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
   const { isPro, loading: proLoading } = useProStatus();
 
   useEffect(() => {
-    const client = getSupabase();
-    setSupabaseClient(client);
-  }, []);
+    const supabase = getSupabase();
+    if (!supabase) {
+      setAuthError("Supabase is not configured.");
+      setLoading(false);
+      return;
+    }
 
-  useEffect(() => {
-    if (!supabaseClient) return;
+    let subscription;
 
-    const initializeAuth = async () => {
+    const init = async () => {
       try {
         setLoading(true);
         setAuthError(null);
 
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        // 1) Read session once
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+
+        const session = data?.session;
         const userEmail = session?.user?.email?.toLowerCase() || "";
         setEmail(userEmail);
 
-        if (userEmail) {
-          localStorage.setItem("simbapdf_email", userEmail);
-        } else {
-          localStorage.removeItem("simbapdf_email");
-        }
+        if (userEmail) localStorage.setItem("simbapdf_email", userEmail);
+        else localStorage.removeItem("simbapdf_email");
 
-        const { data: subscription } = supabaseClient.auth.onAuthStateChange(
-          (_event, session) => {
-            const newEmail = session?.user?.email?.toLowerCase() || "";
-            setEmail(newEmail);
-            if (newEmail) {
-              localStorage.setItem("simbapdf_email", newEmail);
-            } else {
-              localStorage.removeItem("simbapdf_email");
-              router.push("/login");
-            }
+        // 2) Listen for changes
+        const { data: subData } = supabase.auth.onAuthStateChange((event, session2) => {
+          const newEmail = session2?.user?.email?.toLowerCase() || "";
+          setEmail(newEmail);
+
+          if (newEmail) localStorage.setItem("simbapdf_email", newEmail);
+          else localStorage.removeItem("simbapdf_email");
+
+          // ✅ ONLY redirect when user explicitly signs out
+          if (event === "SIGNED_OUT") {
+            router.replace("/login");
           }
-        );
+        });
 
-        return () => subscription?.subscription?.unsubscribe();
+        subscription = subData?.subscription;
       } catch (err) {
         console.error("Auth error:", err);
         setAuthError("Failed to load account. Please try again.");
@@ -63,8 +66,12 @@ export default function AccountPage() {
       }
     };
 
-    initializeAuth();
-  }, [supabaseClient, router]);
+    init();
+
+    return () => {
+      subscription?.unsubscribe?.();
+    };
+  }, [router]);
 
   if (loading) {
     return (
@@ -176,40 +183,32 @@ export default function AccountPage() {
 
             <div className="upload-box" style={{ marginBottom: "1.5rem" }}>
               <strong>Subscription Status</strong>
-              <p 
-                className="hint" 
-                style={{ 
-                  marginTop: "0.5rem", 
+              <p
+                className="hint"
+                style={{
+                  marginTop: "0.5rem",
                   fontSize: "1.1rem",
                   color: proLoading ? "#666" : isPro ? "#2e7d32" : "#e65100",
-                  fontWeight: "500"
+                  fontWeight: "500",
                 }}
               >
-                {proLoading
-                  ? "Checking..."
-                  : isPro
-                  ? "Pro Plan Active ✓"
-                  : "Free Plan (with ads)"}
+                {proLoading ? "Checking..." : isPro ? "Pro Plan Active ✓" : "Free Plan (with ads)"}
               </p>
 
               {!isPro && !proLoading && (
-                <Link 
-                  className="primary-btn" 
-                  href="/pricing" 
-                  style={{ marginTop: "1rem", display: "inline-block" }}
-                >
+                <Link className="primary-btn" href="/pricing" style={{ marginTop: "1rem", display: "inline-block" }}>
                   Upgrade to Pro
                 </Link>
               )}
 
               {isPro && !proLoading && (
-                <Link 
-                  href="/pricing" 
-                  style={{ 
-                    marginTop: "1rem", 
+                <Link
+                  href="/pricing"
+                  style={{
+                    marginTop: "1rem",
                     display: "inline-block",
                     color: "#1976d2",
-                    textDecoration: "underline"
+                    textDecoration: "underline",
                   }}
                 >
                   Manage Plan
@@ -220,23 +219,6 @@ export default function AccountPage() {
             <div style={{ marginTop: "2rem" }}>
               <LogoutButton />
             </div>
-
-            {/* Optional future sections – placeholder style matching tool-section */}
-            <div 
-              className="upload-box" 
-              style={{ 
-                marginTop: "2.5rem", 
-                backgroundColor: "#f9f9f9", 
-                borderStyle: "dashed" 
-              }}
-            >
-              <strong>Recent Files</strong>
-              <p className="hint" style={{ marginTop: "0.75rem" }}>
-                Your recently processed files will appear here soon.
-              </p>
-            </div>
-
-            
           </section>
         </main>
 

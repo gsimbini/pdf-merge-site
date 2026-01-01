@@ -60,19 +60,30 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+  const controller = new AbortController();
+
   setQuoteLoading(true);
 
-  fetch('/api/daily-quote')
-    .then(res => res.json())
-    .then(data => {
+  fetch("/api/daily-quote?ts=" + Date.now(), {
+    cache: "no-store",
+    signal: controller.signal,
+  })
+    .then((res) => res.json())
+    .then((data) => {
       setQuote(data);
     })
-    .catch(err => {
+    .catch((err) => {
+      // Ignore abort errors
+      if (err?.name === "AbortError") return;
+
       console.error(err);
       setQuote({ q: "Success is built one PDF at a time.", a: "SimbaPDF" });
     })
     .finally(() => setQuoteLoading(false));
+
+  return () => controller.abort();
 }, []);
+
 
   const q = search.trim().toLowerCase();
 
